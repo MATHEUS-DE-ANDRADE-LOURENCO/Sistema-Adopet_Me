@@ -19,7 +19,7 @@ O **Adopet.me** é um sistema de adoção de animais domésticos que conecta pes
 
 ## Tecnologias utilizadas
 ### **Frontend**
-- Flutter  
+- React.js  
 
 ### **Backend**
 - Java Spring Boot (API RESTful)  
