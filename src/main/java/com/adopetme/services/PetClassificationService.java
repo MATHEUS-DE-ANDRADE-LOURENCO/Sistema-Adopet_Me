@@ -2,6 +2,8 @@ package com.adopetme.services;
 
 import org.springframework.stereotype.Service;
 
+// Realizando primeiro teste - Sem gravar
+
 @Service
 public class PetClassificationService {
 
