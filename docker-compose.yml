@@ -1,0 +1,43 @@
+# Define versão do projeto
+version: '3.8'
+
+# Define o nome do projeto
+name: Adopet-me
+
+services:
+  # Serviço Frontend (acessível em http://localhost:3030)
+  frontend:
+    # Usa o Dockerfile no diretório 'adopetme-frontend'
+    build:
+      context: ./adopetme-frontend  # pasta onde está o Dockerfile do frontend
+      dockerfile: Dockerfile # Nome do Dockerfile
+    
+    # Mapeamento de portas: HOST_PORT:CONTAINER_PORT
+    ports:
+      - "3030:80"
+    
+    # Faz o frontend esperar o backend estar pronto
+    depends_on:
+      - backend
+    
+    # Reinicia se o container cair
+    restart: always
+
+  # Serviço Backend (Acessível internamente como 'backend:8081')
+  backend:
+    # Usa o Dockerfile no diretório 'adopetme-monolitic-backend'
+    build:
+      context: ./adopetme-monolitic-backend # pasta onde está o Dockerfile do backend
+      dockerfile: Dockerfile # Nome do Dockerfile
+
+    # Mapeamento de portas: Para acesso direto ao backend (ex: para testar ou pelo Jenkins)
+    # 8081 no seu PC será mapeado para a porta 8081 interna do Spring
+    ports:
+      - "8081:8081"
+    
+    # Definindo a porta interna do Spring Boot no ambiente de produção
+    environment:
+      - SERVER_PORT=8081
+      # - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/adopet
+    
+    restart: always
