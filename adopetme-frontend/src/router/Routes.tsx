@@ -3,11 +3,13 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
 import SearchPage from '../pages/SearchPage';
 import AboutUsPage from '../pages/AboutUsPage';
+import SearchResultsPage from '../pages/SearchResultsPage';
+import PetDetailsPage from '../pages/PetDetailsPage';
+import LoginPage from '../pages/LoginPage';
 
 // Desconsiderar: Estas são páginas de espaço reservado simples.
 // Você substituirá essas definições por componentes reais conforme avança no desenvolvimento.
 // Assinado: Murillo Cardoso :P
-const LoginPage = () => <div className="p-10 text-center text-xl font-semibold">Página de Login</div>;
 const RegisterPage = () => <div className="p-10 text-center text-xl font-semibold">Página de Registro</div>;
 const NotFoundPage = () => <div className="p-10 text-center text-3xl font-bold text-red-600">404 - Página Não Encontrada</div>;
 
@@ -20,7 +22,9 @@ const AppRoutes: React.FC = () => {
       
       {/* Rotas de Navegação */}
       <Route path="/search" element={<SearchPage />} />
+      <Route path="/search-results" element={<SearchResultsPage />} />
       <Route path="/about-us" element={<AboutUsPage />} />
+      <Route path="/pets/:id" element={<PetDetailsPage />} />
       
       {/* Rotas de Autenticação */}
       <Route path="/login" element={<LoginPage />} />

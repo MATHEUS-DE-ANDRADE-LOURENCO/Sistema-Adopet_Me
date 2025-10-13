@@ -1,0 +1,30 @@
+version: "3.8"
+name: adopetme-dev
+
+services:
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./adopetme-frontend:/app:cached
+      - /app/node_modules
+    ports:
+      - "3030:5173"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+  backend:
+    image: maven:3.9.5-eclipse-temurin-17
+    working_dir: /app
+    command: mvn spring-boot:run
+    volumes:
+      - ./adopetme-monolitic-backend:/app
+      - ~/.m2:/root/.m2   # cache do Maven local
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8081

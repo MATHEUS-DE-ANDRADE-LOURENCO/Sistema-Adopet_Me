@@ -68,7 +68,7 @@ const AboutUsPage: React.FC = () => {
       <footer className="relative z-10 flex justify-end items-end px-8 py-6">
         <div className="flex flex-col items-center">
           <img
-            src="/logo.png" // 🔸 Substitua pelo caminho real da sua logo
+            src="/logo.png" // substituir pela logo correta
             alt="Logo adopet.me"
             className="w-20 h-20 object-contain"
           />

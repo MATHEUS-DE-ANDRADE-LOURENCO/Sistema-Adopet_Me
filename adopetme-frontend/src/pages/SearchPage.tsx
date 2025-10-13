@@ -1,90 +1,84 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { Search } from "lucide-react";
 
 const SearchPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // ===============================================================
-  // 🔹 Aqui futuramente entrará a requisição para a API.
-  // const API_URI = "https://suaapi.com/api/pets/search";  // <--- URI da requisição
-  //
-  // async function handleSearch() {
-  //   const response = await fetch(`${API_URI}?q=${searchQuery}`);
-  //   const data = await response.json();
-  //   // Armazenar dados e redirecionar:
-  //   navigate("/search-results", { state: { results: data } });
-  // }
-  // ===============================================================
-
-  // 🔸 Por enquanto, busca simulada:
   function handleSearch() {
+    if (searchQuery.trim() === "") return;
     console.log("Busca simulada por:", searchQuery);
-    navigate("/search-results"); // <--- redirecionamento para SearchResultsPage
+    navigate(`/search-results?q=${encodeURIComponent(searchQuery)}`);
+  }
+
+  function handleKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") handleSearch();
   }
 
   return (
-    <div className="min-h-screen w-screen bg-gray-50 flex flex-col overflow-x-hidden">
-      {/* Navbar fixa no topo */}
+    <div className="min-h-screen w-screen flex flex-col bg-[#FFF8F0] overflow-x-hidden">
       <Navbar />
+      <main className="flex-1 w-full flex flex-col items-center py-20">
+        <div className="w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 flex flex-col items-center">
+            
+            {/* Título */}
+            <header className="text-center mb-10 w-full">
+              <h1 className="text-4xl sm:text-5xl font-extrabold text-[#3b1f0e] mb-4">
+                🐾 Encontre seu novo melhor amigo
+              </h1>
+              <p className="text-lg text-[#7b5a3b] max-w-2xl mx-auto">
+                Utilize a busca abaixo para encontrar o pet perfeito para você.
+              </p>
+            </header>
 
-      {/* Conteúdo Principal */}
-      <main className="flex-1 w-full flex justify-center">
-        <div className="w-full max-w-7xl px-6 sm:px-8 lg:px-10 py-16">
-          <header className="text-center mb-12">
-            <h1 className="text-4xl font-extrabold text-neutral-950 mb-4">
-              🐾 Encontre seu novo melhor amigo
-            </h1>
-            <p className="text-lg text-stone-600">
-              Utilize os filtros abaixo para encontrar o pet perfeito.
-            </p>
-          </header>
-
-          {/* Barra de busca e filtros */}
-          <section className="bg-white p-8 rounded-2xl shadow-md border border-amber-100 mb-12">
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <input
-                type="text"
-                placeholder="Digite o nome do pet ou espécie..."
-                className="flex-1 w-full px-5 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button
-                onClick={handleSearch}
-                className="px-8 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-full transition duration-200"
-              >
-                Buscar
-              </button>
-            </div>
-
-            {/* 🔸 Aqui futuramente podem entrar filtros adicionais (raça, idade, etc.) */}
-          </section>
-
-          {/* Resultados simulados */}
-          <section>
-            <h2 className="text-2xl font-bold text-neutral-900 mb-6">
-              Resultados recentes:
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-              {["Pet 1", "Pet 2", "Pet 3"].map((pet, index) => (
-                <div
-                  key={index}
-                  className="h-48 bg-white border border-dashed border-amber-400/60 rounded-xl flex items-center justify-center text-stone-700 font-medium shadow-sm hover:shadow-md transition"
-                >
-                  {pet}
+            {/* Área de busca */}
+            <section className="bg-white border border-[#c4742a]/20 shadow-md rounded-2xl p-8 w-full max-w-2xl">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-3.5 text-[#c4742a]" size={22} />
+                  <input
+                    type="text"
+                    placeholder="Digite o nome ou espécie do pet..."
+                    className="w-full text-neutral-950 pl-12 pr-4 py-3 border border-[#c4742a]/30 rounded-full focus:outline-none focus:ring-2 focus:ring-[#c4742a]"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                  />
                 </div>
-              ))}
-            </div>
-          </section>
+                <button
+                  onClick={handleSearch}
+                  className="px-8 py-3 bg-[#c4742a] hover:bg-[#a75e22] text-white font-bold rounded-full transition-all duration-200"
+                >
+                  Buscar
+                </button>
+              </div>
+            </section>
+
+            {/* Resultados simulados */}
+            <section className="mt-16 w-full max-w-6xl">
+              <h2 className="text-2xl font-bold text-[#3b1f0e] mb-6">
+                Resultados recentes
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                {["Luna 🐶", "Milo 🐱", "Tobby 🐕"].map((pet, index) => (
+                  <div
+                    key={index}
+                    className="h-48 bg-white border border-[#c4742a]/30 rounded-xl flex items-center justify-center text-[#3b1f0e] font-medium shadow-sm hover:shadow-md hover:scale-[1.02] transition-all"
+                  >
+                    {pet}
+                  </div>
+                ))}
+              </div>
+            </section>
         </div>
       </main>
 
-      {/* Rodapé simples */}
-      <footer className="bg-amber-100 py-6 mt-12 text-center text-stone-600 text-sm w-full">
-        © 2025 adopet.me — Todos os direitos reservados.
+      {/* 3. Rodapé: Sem margem superior desnecessária. */}
+      <footer className="bg-[#f7e2c8] py-6 text-center text-[#7b5a3b] text-sm w-full border-t border-[#c4742a]/10">
+        © {new Date().getFullYear()} adopet.me — Todos os direitos reservados.
       </footer>
     </div>
   );

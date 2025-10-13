@@ -26,19 +26,13 @@ const HeroSection: React.FC = () => {
 
         {/* Ilustração */}
         <div className="flex justify-center items-center relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-1/2">
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-neutral-950">
-              adopet.me
-            </h2>
-          </div>
-
           <div className="flex space-x-4">
-            <div className="p-8 bg-amber-200 rounded-2xl shadow-2xl relative">
+            <div className="p-8 bg-orange-500 rounded-2xl shadow-2xl relative">
               <Bone className="w-32 h-32 text-amber-800 transform rotate-12 -translate-y-4" />
-              <PawPrint className="absolute bottom-4 right-4 w-12 h-12 text-amber-900/50" />
+              <PawPrint className="absolute bottom-4 right-4 w-12 h-12 text-amber-900/70" />
             </div>
-            <div className="p-8 bg-stone-200 rounded-2xl shadow-2xl relative -mt-8">
-              <PawPrint className="w-32 h-32 text-stone-700 transform -rotate-12 translate-y-4" />
+            <div className="p-8 bg-amber-200 rounded-2xl shadow-2xl relative -mt-8">
+              <PawPrint className="w-32 h-32 text-amber-800 transform -rotate-12 translate-y-4" />
               <Heart className="absolute top-4 left-4 w-12 h-12 text-red-500/80" />
             </div>
           </div>

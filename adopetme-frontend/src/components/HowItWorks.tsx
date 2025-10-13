@@ -21,7 +21,7 @@ const HowItWorksSection: React.FC = () => {
     },
     {
       number: "3°",
-      title: "Adote com responsabilidade",
+      title: "Adopet!",
       description: "Entre em contato com a ONG e dê um lar cheio de amor.",
       icon: Heart,
       iconColor: "text-red-600 fill-red-600",
@@ -55,14 +55,14 @@ const HowItWorksSection: React.FC = () => {
                 </p>
               </div>
 
-              {/* Seta de Conexão (visível apenas entre os passos e em telas maiores) */}
+              {/* Seta de Conexão */}
               {index < steps.length - 1 && (
                 <div className="hidden md:flex items-center justify-center h-24 my-auto relative">
                   <ArrowRight className="w-8 h-8 text-amber-800" />
                 </div>
               )}
               
-              {/* Seta de Conexão (visível apenas em telas menores) */}
+              {/* Seta de Conexão */}
               {index < steps.length - 1 && (
                 <div className="flex md:hidden justify-center my-4 w-full">
                   <ArrowRight className="w-6 h-6 text-amber-600 transform rotate-90" />
