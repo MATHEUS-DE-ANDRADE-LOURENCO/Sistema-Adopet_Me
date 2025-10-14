@@ -3,23 +3,38 @@ import React, { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { FcGoogle } from "react-icons/fc";
+// import { login, handleGoogleRedirect } from "../services/AuthService";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [lembrar, setLembrar] = useState(false);
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("Email:", email, "Senha:", senha);
-    navigate("/confirmacao");
+    setError(null);
+    setLoading(true);
+
+    try {
+      // const token = await login(email, password);
+      navigate("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Erro desconhecido ao fazer login...");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
-    console.log("Login com Google");
-    navigate("/confirmacao");
-  };
+    // handleGoogleRedirect();
+  }
 
   return (
     <div className="min-h-screen w-screen flex flex-col">
@@ -41,8 +56,8 @@ const LoginPage: React.FC = () => {
             <input
               type="password"
               placeholder="Senha"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="border-2 border-yellow-600 text-neutral-950 p-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
@@ -51,8 +66,8 @@ const LoginPage: React.FC = () => {
               <label className="flex items-center gap-2 text-neutral-950">
                 <input
                   type="checkbox"
-                  checked={lembrar}
-                  onChange={(e) => setLembrar(e.target.checked)}
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
                   className="accent-yellow-600"
                 />
                 Lembrar senha
