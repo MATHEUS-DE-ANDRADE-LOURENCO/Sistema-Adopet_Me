@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { Pet } from "../models/PetModel";
+import Footer from "../components/Footer";
 
 export default function SearchResultsPage() {
   const location = useLocation();
@@ -63,6 +64,8 @@ export default function SearchResultsPage() {
           </div>
         )}
       </main>
+      {/* Rodapé com logo */}
+      <Footer />
     </div>
   );
 }
