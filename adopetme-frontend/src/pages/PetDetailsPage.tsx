@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { Pet } from "../models/PetModel";
 import { Heart, Home, PawPrint, Calendar } from "lucide-react";
+import Footer from "../components/Footer";
 
 // Mock de Dados: Em uma aplicação real, faria uma chamada de API usando o 'id'.
 const MOCK_PETS: Pet[] = [
@@ -116,10 +117,8 @@ export default function PetDetailsPage() {
                 </div>
             </main>
 
-            {/* Rodapé fixo no final */}
-            <footer className="bg-[#f7e2c8] py-6 text-center text-[#7b5a3b] text-sm w-full border-t border-[#c4742a]/10">
-                &copy; {new Date().getFullYear()} adopet.me — Adote com responsabilidade.
-            </footer>
+            {/* Rodapé com logo */}
+            <Footer />
         </div>
     );
 }

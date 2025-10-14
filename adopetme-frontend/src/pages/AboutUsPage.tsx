@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../components/Navbar";
 import { PawPrint } from "lucide-react";
+import Footer from "../components/Footer";
 
 const AboutUsPage: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ const AboutUsPage: React.FC = () => {
       <Navbar />
 
       {/* Marca d’água de pata no fundo */}
-      <div className="absolute inset-0 flex justify-center items-center">
+      <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
         <PawPrint className="w-[80%] sm:w-[60%] lg:w-[40%] text-amber-900/10" />
       </div>
 
@@ -63,18 +64,8 @@ const AboutUsPage: React.FC = () => {
           </div>
         </section>
       </main>
-
       {/* Rodapé com logo */}
-      <footer className="relative z-10 flex justify-end items-end px-8 py-6">
-        <div className="flex flex-col items-center">
-          <img
-            src="/logo.png" // substituir pela logo correta
-            alt="Logo adopet.me"
-            className="w-20 h-20 object-contain"
-          />
-          <span className="font-semibold text-neutral-700">adopet.me</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

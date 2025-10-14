@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { Search } from "lucide-react";
+import Footer from "../components/Footer";
 
 const SearchPage: React.FC = () => {
   const navigate = useNavigate();
@@ -76,10 +77,8 @@ const SearchPage: React.FC = () => {
         </div>
       </main>
 
-      {/* 3. Rodapé: Sem margem superior desnecessária. */}
-      <footer className="bg-[#f7e2c8] py-6 text-center text-[#7b5a3b] text-sm w-full border-t border-[#c4742a]/10">
-        © {new Date().getFullYear()} adopet.me — Todos os direitos reservados.
-      </footer>
+      {/* Rodapé com logo */}
+      <Footer />
     </div>
   );
 };

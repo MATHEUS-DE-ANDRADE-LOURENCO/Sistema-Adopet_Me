@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import HowItWorksSection from '../components/HowItWorks';
+import Footer from '../components/Footer';
 
 
 const HomePage: React.FC = () => {
@@ -17,10 +18,8 @@ const HomePage: React.FC = () => {
         {/* Você pode adicionar outras seções aqui */}
       </main>
 
-      {/* Footer */}
-      <footer className="w-full bg-yellow-600 text-white py-6 text-center">
-        &copy; {new Date().getFullYear()} adopet.me - Todos os direitos reservados
-      </footer>
+      {/* Rodapé com logo */}
+      <Footer />
     </div>
   );
 };
