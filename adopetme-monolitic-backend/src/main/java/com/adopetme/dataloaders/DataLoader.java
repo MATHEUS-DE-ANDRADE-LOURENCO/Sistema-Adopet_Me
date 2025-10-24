@@ -1,6 +1,6 @@
 package com.adopetme.dataloaders;
 
-import com.adopetme.models.UserModel;
+import com.adopetme.models.User;
 import com.adopetme.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +19,10 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (userRepository.findByEmail("admin@adopetme.com").isEmpty()) {
-            UserModel admin = new UserModel();
+            User admin = new User();
             admin.setEmail("admin@adopetme.com");
-            admin.setPassword(bCryptPasswordEncoder.encode("admin123"));
-            admin.setRole("ADMIN");
+            admin.setSenha(bCryptPasswordEncoder.encode("admin123"));
+            admin.setTipoUsuario("ADMIN");
             userRepository.save(admin);
         }
 

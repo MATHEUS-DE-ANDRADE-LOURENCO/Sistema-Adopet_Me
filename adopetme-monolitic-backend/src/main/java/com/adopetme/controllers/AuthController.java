@@ -1,6 +1,6 @@
 package com.adopetme.controllers;
 
-import com.adopetme.models.UserModel;
+import com.adopetme.models.User;
 import com.adopetme.repositories.UserRepository;
 import com.adopetme.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +31,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserModel loginData) {
-        Optional<UserModel> user = userRepository.findByEmail(loginData.getEmail());
+    public ResponseEntity<?> login(@RequestBody User loginData) {
+        Optional<User> user = userRepository.findByEmail(loginData.getEmail());
 
         if(user.isEmpty()) {
             return ResponseEntity.status(404).body("Usuário não encontrado...");
         }
 
-        // Use a senha do UserModel na injeção (agora que o passwordEncoder é um Bean)
+        // Use a senha do User na injeção (agora que o passwordEncoder é um Bean)
         if (!passwordEncoder.matches(loginData.getPassword(), user.get().getPassword())) {
             return ResponseEntity.status(401).body("Senha incorreta...");
         }
