@@ -2,6 +2,26 @@ version: "3.8"
 name: adopetme-dev
 
 services:
+  # ==========================================================
+  # SERVIÇO: Banco de Dados (Idêntico ao outro docker-compose)
+  # ==========================================================
+  db:
+    image: postgres:15
+    container_name: adopetme_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      # Mapeia para 5433 para não conflitar com um Postgres local
+      - "5433:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+
+  # ==========================================================
+  # SERVIÇO: Frontend (com Hot-Reload)
+  # ==========================================================
   frontend:
     image: node:20-alpine
     working_dir: /app
@@ -10,12 +30,16 @@ services:
       - ./adopetme-frontend:/app:cached
       - /app/node_modules
     ports:
+      # A porta 5173 (Vite) é exposta como 3030 na sua máquina
       - "3030:5173"
     environment:
       - NODE_ENV=development
     depends_on:
       - backend
 
+  # ==========================================================
+  # SERVIÇO: Backend (com Hot-Reload)
+  # ==========================================================
   backend:
     image: maven:3.9.5-eclipse-temurin-17
     working_dir: /app
@@ -25,6 +49,28 @@ services:
       - ~/.m2:/root/.m2   # cache do Maven local
     ports:
       - "8081:8081"
+    depends_on:
+      - db # Adiciona a dependência do banco
     environment:
+      # --- Configuração do Perfil e Porta ---
       - SPRING_PROFILES_ACTIVE=dev
       - SERVER_PORT=8081
+
+      # --- Configuração do Banco de Dados ---
+      # (Lê do arquivo .env)
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      
+      # --- Configuração do Google OAuth2 ---
+      # (Lê do arquivo .env)
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+
+      # --- Configuração do JWT ---
+      # (Lê do arquivo .env)
+      - APP_JWT_SECRET=${APP_JWT_SECRET}
+
+volumes:
+  # Volume separado para o banco de dev
+  postgres_data_dev:

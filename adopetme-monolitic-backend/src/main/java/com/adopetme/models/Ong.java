@@ -34,7 +34,7 @@ public class Ong {
     private OffsetDateTime dtRegistro;
 
     @OneToMany(mappedBy = "ong", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Usuario> usuarios;
+    private List<User> usuarios;
 
     @OneToMany(mappedBy = "ong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets;
@@ -80,8 +80,8 @@ public class Ong {
     public OffsetDateTime getDtRegistro() { return dtRegistro; }
     public void setDtRegistro(OffsetDateTime dtRegistro) { this.dtRegistro = dtRegistro; }
 
-    public List<Usuario> getUsuarios() { return usuarios; }
-    public void setUsuarios(List<Usuario> usuarios) { this.usuarios = usuarios; }
+    public List<User> getUsuarios() { return usuarios; }
+    public void setUsuarios(List<User> usuarios) { this.usuarios = usuarios; }
 
     public List<Pet> getPets() { return pets; }
     public void setPets(List<Pet> pets) { this.pets = pets; }

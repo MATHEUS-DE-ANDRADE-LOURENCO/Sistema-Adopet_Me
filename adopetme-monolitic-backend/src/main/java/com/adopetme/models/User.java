@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "USUARIO")
+@Table(name = "USUARIO") // A tabela no DB ainda se chama USUARIO
 @Getter
 @Setter
 @NoArgsConstructor
-public class Usuario implements UserDetails {
+public class User implements UserDetails { // Classe Renomeada
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer id; // Usando Integer como chave primária
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_ong")
@@ -33,7 +33,7 @@ public class Usuario implements UserDetails {
     private String login;
 
     @Column(nullable = false)
-    private String senha; // Usaremos este campo para o getPassword()
+    private String senha;
 
     @Column(nullable = false)
     private String nome;
@@ -41,7 +41,7 @@ public class Usuario implements UserDetails {
     private String sobrenome;
 
     @Column(nullable = false, unique = true)
-    private String email; // Usaremos este campo para o getUsername()
+    private String email;
 
     @Column(unique = true)
     private String cpf;
@@ -50,7 +50,7 @@ public class Usuario implements UserDetails {
     private String telefone;
 
     @Column(name = "tipo_user", nullable = false)
-    private String tipoUsuario; // Usaremos este campo para a ROLE
+    private String tipoUsuario;
 
     @Column(name = "dt_cadastro")
     private OffsetDateTime dtCadastro;
@@ -65,6 +65,10 @@ public class Usuario implements UserDetails {
         }
     }
 
+    // ==========================================================
+    // Implementação dos Métodos do UserDetails
+    // ==========================================================
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Usa o campo 'tipoUsuario' como a ROLE.
@@ -74,12 +78,13 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getPassword() {
-        // Retorna o campo 'senha' da sua classe Usuario.
+        // Retorna o campo 'senha'
         return this.senha;
     }
 
     @Override
     public String getUsername() {
+        // Usa o 'email' como o nome de usuário para login.
         return this.email;
     }
 
@@ -103,12 +108,13 @@ public class Usuario implements UserDetails {
         return true;
     }
 
+    // Métodos equals e hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Usuario usuario = (Usuario) o;
-        return Objects.equals(id, usuario.id);
+        User user = (User) o; // Renomeado
+        return Objects.equals(id, user.id);
     }
 
     @Override

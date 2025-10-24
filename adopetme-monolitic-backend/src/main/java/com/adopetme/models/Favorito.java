@@ -13,17 +13,18 @@ public class Favorito {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY) // Adicionado LAZY para performance
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", nullable = false, foreignKey = @ForeignKey(name = "fk_favorito_usuario"))
-    private Usuario usuario;
+    private User usuario; // Alterado de Usuario para User
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY) // Adicionado LAZY para performance
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_pet", nullable = false, foreignKey = @ForeignKey(name = "fk_favorito_pet"))
     private Pet pet;
 
     @Column(name = "dt_favorito")
     private OffsetDateTime dtFavorito;
 
+    // Construtor padrão (requerido pelo JPA)
     public Favorito() {
     }
 
@@ -43,11 +44,11 @@ public class Favorito {
         this.id = id;
     }
 
-    public Usuario getUsuario() {
+    public User getUsuario() { // Alterado de Usuario para User
         return usuario;
     }
 
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(User usuario) { // Alterado de Usuario para User
         this.usuario = usuario;
     }
 
@@ -67,6 +68,7 @@ public class Favorito {
         this.dtFavorito = dtFavorito;
     }
 
+    // Métodos equals e hashCode baseados no ID
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -80,6 +82,7 @@ public class Favorito {
         return Objects.hash(id);
     }
 
+    // Método toString (Corrigido para usar usuario.getId())
     @Override
     public String toString() {
         return "Favorito{" +

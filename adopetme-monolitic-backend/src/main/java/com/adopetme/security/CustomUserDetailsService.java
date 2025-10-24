@@ -1,6 +1,6 @@
 package com.adopetme.security;
 
-import com.adopetme.models.UserModel;
+import com.adopetme.models.User;
 import com.adopetme.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     // Este método é usado pelo Spring Security para carregar o usuário por nome (email)
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Usa o repositório existente para buscar o UserModel
+        // Usa o repositório existente para buscar o User
         return userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Usuário não encontrado com e-mail: " + email)
