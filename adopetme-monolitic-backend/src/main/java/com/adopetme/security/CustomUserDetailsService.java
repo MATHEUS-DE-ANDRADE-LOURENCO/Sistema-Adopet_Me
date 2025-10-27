@@ -1,6 +1,5 @@
 package com.adopetme.security;
 
-import com.adopetme.models.UserModel;
 import com.adopetme.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

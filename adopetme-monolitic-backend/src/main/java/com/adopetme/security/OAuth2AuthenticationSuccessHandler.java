@@ -1,7 +1,6 @@
 package com.adopetme.security;
 
 import com.adopetme.config.AppProperties;
-// 🚨 NOVO IMPORT: Importe o UserService
 import com.adopetme.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,10 +16,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final JwtTokenProvider tokenProvider;
     private final AppProperties appProperties;
-    // 🚨 NOVO: Adicione o UserService
     private final UserService userService;
 
-    // 🚨 Construtor Atualizado: Injete o UserService
     public OAuth2AuthenticationSuccessHandler(
             JwtTokenProvider tokenProvider,
             AppProperties appProperties,
@@ -37,8 +34,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // O e-mail é o identificador principal do usuário vindo do Google
         String email = oAuth2User.getAttribute("email");
 
-        // 🚨 LÓGICA DE NEGÓCIO: Salva ou Atualiza o usuário no banco de dados
-        // Isso garante que todo usuário autenticado via Google tenha um registro em sua tabela 'users'.
         userService.saveOrUpdateOAuth2User(email);
 
         // 1. Gera o JWT usando o provedor que criamos
@@ -48,6 +43,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String redirectUri = appProperties.getOauth2().getAuthorizedRedirectUris();
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("token", token)
+                .queryParam("email", email)
                 .build().toUriString();
 
         // 3. Redireciona o cliente para o Frontend
