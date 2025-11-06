@@ -5,39 +5,69 @@ version: '3.8'
 name: Adopet-me
 
 services:
-  # Serviço Frontend (acessível em http://localhost:3030)
-  frontend:
-    # Usa o Dockerfile no diretório 'adopetme-frontend'
-    build:
-      context: ./adopetme-frontend  # pasta onde está o Dockerfile do frontend
-      dockerfile: Dockerfile # Nome do Dockerfile
-    
-    # Mapeamento de portas: HOST_PORT:CONTAINER_PORT
+  # ==========================================================
+  # SERVIÇO: Banco de Dados PostgreSQL
+  # ==========================================================
+  db:
+    image: postgres:15
+    container_name: adopetme_postgres
+    restart: unless-stopped
+    environment:
+      # Usa as variáveis do arquivo .env para criar o banco
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "3030:80"
-    
-    # Faz o frontend esperar o backend estar pronto
-    depends_on:
-      - backend
-    
-    # Reinicia se o container cair
-    restart: always
+      # Mapeia a porta 5433 da sua máquina para a 5432 do container
+      - "5433:5432"
+    volumes:
+      # Garante que os dados do banco não sejam perdidos
+      - postgres_data:/var/lib/postgresql/data
 
-  # Serviço Backend (Acessível internamente como 'backend:8081')
+  # ==========================================================
+  # SERVIÇO: Backend Spring Boot
+  # ==========================================================
   backend:
-    # Usa o Dockerfile no diretório 'adopetme-monolitic-backend'
     build:
-      context: ./adopetme-monolitic-backend # pasta onde está o Dockerfile do backend
-      dockerfile: Dockerfile # Nome do Dockerfile
-
-    # Mapeamento de portas: Para acesso direto ao backend (ex: para testar ou pelo Jenkins)
-    # 8081 no seu PC será mapeado para a porta 8081 interna do Spring
+      context: ./adopetme-monolitic-backend
+      dockerfile: Dockerfile
     ports:
       - "8081:8081"
-    
-    # Definindo a porta interna do Spring Boot no ambiente de produção
+    depends_on:
+      - db # Garante que o container do banco inicie antes do backend
     environment:
       - SERVER_PORT=8081
-      # - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/adopet
-    
+      
+      # --- Configuração do Banco de Dados para o Spring ---
+      # URL de conexão completa (hostname 'db' é o nome do serviço)
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      
+      # --- Configuração do JPA/Hibernate ---
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      
+      # MUDANÇA CRÍTICA: 'validate' é o correto ao usar Flyway
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+
     restart: always
+
+  # ==========================================================
+  # SERVIÇO: Frontend
+  # ==========================================================
+  frontend:
+    build:
+      context: ./adopetme-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3030:80"
+    depends_on:
+      - backend
+    restart: always
+
+# ==========================================================
+# Volume de dados para o banco
+# ==========================================================
+volumes:
+  postgres_data:
+
