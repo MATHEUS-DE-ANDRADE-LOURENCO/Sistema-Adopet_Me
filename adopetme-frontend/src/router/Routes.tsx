@@ -6,6 +6,7 @@ import AboutUsPage from '../pages/AboutUsPage';
 import SearchResultsPage from '../pages/SearchResultsPage';
 import PetDetailsPage from '../pages/PetDetailsPage';
 import LoginPage from '../pages/LoginPage';
+import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler';
 
 
 // Desconsiderar: Estas são páginas de espaço reservado simples.
@@ -32,6 +33,8 @@ const AppRoutes: React.FC = () => {
       {/* Rotas de Autenticação */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+
+      <Route path="/auth/oauth2/redirect" element={<OAuth2RedirectHandler />} />
       <Route path="/register-animal" element={<AnimalRegistrationPage />} />
 
       {/* Rota Curinga para 404 (qualquer caminho não mapeado) */}
