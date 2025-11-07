@@ -8,38 +8,15 @@ export interface LoginResponse {
   message: string;
 }
 
-// 1. Interface para os dados de registro
-export interface RegisterData {
-  tipoUsuario: 'TUTOR' | 'ONG';
-  email: string;
-  senha: string;
-  
-  // Tutor
-  nome?: string;
-  sobrenome?: string;
-
-  // ONG
-  nomeOng?: string;
-  cnpj?: string; // Adicione se necessário
-  telefone?: string;
-  endereco?: string;
-}
-
-// 2. Interface para a resposta de registro
-export interface RegisterResponse {
-  token: string | null; // Pode não retornar token no registro
-  message: string;
-}
-
-
-export async function login(email: string, password: string): Promise<LoginResponse> {
+export async function login(email: string, senha: string): Promise<LoginResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }), 
+      // O corpo da requisição é exatamente o que o Postman provou ser funcional:
+      body: JSON.stringify({ email, senha }), 
     });
 
     if (response.ok) {
