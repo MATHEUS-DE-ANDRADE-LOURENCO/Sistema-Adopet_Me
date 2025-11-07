@@ -1,9 +1,8 @@
 version: "3.8"
-name: adopetme-dev
 
 services:
   # ==========================================================
-  # SERVIÇO: Banco de Dados (Idêntico ao outro docker-compose)
+  # SERVIÇO: Banco de Dados
   # ==========================================================
   db:
     image: postgres:15
@@ -20,7 +19,7 @@ services:
       - postgres_data_dev:/var/lib/postgresql/data
 
   # ==========================================================
-  # SERVIÇO: Frontend (com Hot-Reload)
+  # SERVIÇO: Frontend
   # ==========================================================
   frontend:
     image: node:20-alpine
@@ -38,12 +37,12 @@ services:
       - backend
 
   # ==========================================================
-  # SERVIÇO: Backend (com Hot-Reload)
+  # SERVIÇO: Backend
   # ==========================================================
   backend:
     image: maven:3.9.5-eclipse-temurin-17
     working_dir: /app
-    command: mvn spring-boot:run
+    command: sh -c "mvn clean && mvn spring-boot:run"
     volumes:
       - ./adopetme-monolitic-backend:/app
       - ~/.m2:/root/.m2   # cache do Maven local
