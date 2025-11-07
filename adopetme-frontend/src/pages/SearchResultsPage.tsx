@@ -15,16 +15,33 @@ export default function SearchResultsPage() {
     navigate(`/pets/${petId}`);
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      const mockResults: Pet[] = [
-        { id: 1, nome: "Rex", tipo: "Cachorro", idade: "2 anos" },
-        { id: 2, nome: "Mia", tipo: "Gato", idade: "1 ano" },
-      ];
-      setResults(mockResults);
-      setLoading(false);
-    }, 1200);
-  }, [query]);
+    useEffect(() => {
+    if (query) {
+        setLoading(true);
+        
+        fetch(`/api/pets/search?q=${encodeURIComponent(query)}`) 
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na busca');
+                }
+                return response.json();
+            })
+            .then(data => {
+
+                setResults(data);
+            })
+            .catch(error => {
+                console.error("Erro ao buscar pets:", error);
+                setResults([]); 
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    } else {
+        setLoading(false);
+        setResults([]);
+    }
+}, [query]);
 
   return (
     <div className="min-h-screen w-screen bg-[#FFF8F0] flex flex-col">

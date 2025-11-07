@@ -5,12 +5,6 @@ import { Pet } from "../models/PetModel";
 import { Heart, Home, PawPrint, Calendar } from "lucide-react";
 import Footer from "../components/Footer";
 
-// Mock de Dados: Em uma aplicação real, faria uma chamada de API usando o 'id'.
-const MOCK_PETS: Pet[] = [
-    { id: 1, nome: "Rex", tipo: "Cachorro", idade: "2 anos" },
-    { id: 2, nome: "Mia", tipo: "Gato", idade: "1 ano" },
-    { id: 3, nome: "Bolt", tipo: "Cachorro", idade: "3 anos" },
-];
 
 export default function PetDetailsPage() {
     // Captura o ID do pet da URL (ex: /pets/1)
@@ -21,15 +15,74 @@ export default function PetDetailsPage() {
 
     useEffect(() => {
         setLoading(true);
-        // Simulação de chamada de API: busca o pet pelo ID
-        setTimeout(() => {
-            const petId = parseInt(id || '0');
-            const foundPet = MOCK_PETS.find(p => p.id === petId) || null;
-            
-            setPet(foundPet);
+        const petId = parseInt(id || '0');
+
+        if (petId) {
+        // Chamada real ao backend
+            fetch(`/api/pets/${petId}`) 
+                .then(response => {
+                    if (response.status === 404) {
+                    // Trata o caso de "Pet não encontrado 😢" [8]
+                        setPet(null); 
+                        return; // Sai do fluxo de sucesso
+                    }
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar detalhes do pet');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    setPet(data);
+                })
+                .catch(error => {
+                    console.error("Erro ao buscar detalhes:", error);
+                    setPet(null);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } else {
             setLoading(false);
-        }, 800);
+            setPet(null);
+        }
     }, [id]);
+function handleFavorite() {
+    const currentUserId = 1; 
+
+    
+    if (!pet) {
+        console.error("Nenhum pet selecionado para favoritar.");
+        return;
+    }
+
+    // Chama o endpoint de criação de favorito
+    fetch(`/api/favorites?userId=${currentUserId}&petId=${pet.id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // Headers de autenticação (ex: Bearer Token) seriam adicionados aqui
+        },
+    })
+    .then(response => {
+        if (response.status === 201) { // 201 CREATED do FavoritoController
+            console.log("Pet favoritado com sucesso!");
+            // Atualizar o estado do botão "Favoritar"
+        } else if (response.status === 409) { // Se for UNIQUE constraint violada [18]
+            console.log("Pet já está nos favoritos.");
+        } else {
+            console.error("Falha ao favoritar.");
+        }
+    })
+    .catch(error => console.error("Erro na API de favoritos:", error));
+}
+
+// ... E ligar a função ao botão "Favoritar" [16]:
+<button 
+    onClick={handleFavorite} 
+    /* ... classes */
+>
+    Favoritar
+</button>
 
     // Trata estados de carregamento e Pet não encontrado
     if (loading) {
