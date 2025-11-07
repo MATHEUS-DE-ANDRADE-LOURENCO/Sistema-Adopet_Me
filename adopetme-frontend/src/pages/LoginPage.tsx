@@ -28,18 +28,12 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      // 🚨 Chamada ao serviço que envia o JSON para o Backend
       const { token } = await login(email, password); 
-      
       setSession('LOGGED_IN', token, email);
-      
-      // Simulação: Guardar o role mockado até implementarmos um endpoint de perfil
       localStorage.setItem("user_role_mock", localSelection);
-      
       navigate("/");
     } catch (error) {
       if (error instanceof Error) {
-        // Exibe a mensagem de erro detalhada retornada pelo backend (ex: "Senha incorreta.")
         setError(error.message);
       } else {
         setError("Erro desconhecido ao fazer login.");
@@ -64,22 +58,30 @@ const LoginPage: React.FC = () => {
         <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
           <h1 className="text-2xl font-bold text-center mb-6 text-black">Bem-Vindo de Volta!</h1>
 
-          {/* Botões de Seleção de Perfil (Para fins de UX/IHC) */}
+          {/* Botões de Seleção de Perfil (COM CONTRASTE CORRIGIDO) */}
           <div className="flex items-center justify-center gap-6 mb-6">
               <button
                   type="button"
                   onClick={() => setLocalSelection('ONG')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-amber-600 transition duration-200 ${localSelection === 'ONG' ? 'bg-amber-600 text-white shadow-md' : 'bg-white text-black hover:bg-amber-50'}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-amber-600 transition duration-200 ${
+                    localSelection === 'ONG' 
+                      ? 'bg-white text-amber-600 hover:bg-amber-50' 
+                      : 'bg-amber-600 text-white shadow-md'
+                  }`}
               >
-                  <FaUsers className="w-5 h-5" style={{ color: localSelection === 'ONG' ? '#ffffff' : undefined }} />
+                  <FaUsers className="w-5 h-5" />
                   <span className="font-semibold">ONG</span>
               </button>
               <button
                   type="button"
                   onClick={() => setLocalSelection('TUTOR')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-amber-600 transition duration-200 ${localSelection === 'TUTOR' ? 'bg-amber-600 text-white shadow-md' : 'bg-white text-black hover:bg-amber-50'}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-amber-600 transition duration-200 ${
+                    localSelection === 'TUTOR' 
+                      ? 'bg-white text-amber-600 hover:bg-amber-50'
+                      : 'bg-amber-600 text-white shadow-md'
+                  }`}
               >
-                  <FaPaw className="w-5 h-5" style={{ color: localSelection === 'TUTOR' ? '#ffffff' : undefined }} />
+                  <FaPaw className="w-5 h-5" />
                   <span className="font-semibold">Tutor</span>
               </button>
           </div>
@@ -144,7 +146,7 @@ const LoginPage: React.FC = () => {
             Não tem uma conta?{" "}
             <span
               className="text-yellow-600 hover:underline cursor-pointer"
-              onClick={() => navigate("/registro")}
+              onClick={() => navigate("/register")} // Verifique se o caminho é /register ou /registro
             >
               Registre-se
             </span>
