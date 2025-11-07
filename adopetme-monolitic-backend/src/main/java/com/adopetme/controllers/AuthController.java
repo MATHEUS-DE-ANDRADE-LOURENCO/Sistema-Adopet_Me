@@ -2,7 +2,9 @@ package com.adopetme.controllers;
 
 import com.adopetme.dtos.LoginRequest;
 import com.adopetme.models.User;
+import com.adopetme.models.Ong; // 1. Importar Ong
 import com.adopetme.repositories.UserRepository;
+import com.adopetme.repositories.OngRepository; // 2. Importar OngRepository
 import com.adopetme.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,23 +12,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.Map; // 3. Importar Map
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*") // Permite chamadas do frontend
 public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
 
-    // 🚨 Injete o Provedor de Tokens para gerar o JWT
+    @Autowired
+    private OngRepository ongRepository; // 4. Injetar OngRepository
+
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    // 🚨 O BCryptPasswordEncoder agora é injetado, mas mantive sua declaração para clareza
     private final BCryptPasswordEncoder passwordEncoder;
 
-    // Construtor para injeção do BCryptPasswordEncoder (melhor prática)
     public AuthController(BCryptPasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }

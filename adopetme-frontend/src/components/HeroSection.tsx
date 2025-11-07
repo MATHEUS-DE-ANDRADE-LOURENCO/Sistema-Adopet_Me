@@ -20,7 +20,7 @@ const HeroSection: React.FC = () => {
             Conectamos pessoas a ONGs de adoção de pets, de forma simples, rápida e responsável.
           </p>
           <button className="w-75 mx-auto block px-10 py-4 text-xl font-bold rounded-full !text-white !bg-amber-800 hover:!bg-amber-900 shadow-xl transition duration-300 transform hover:scale-[1.02]">
-            Busque Ongs Já!
+            Busque Pets Já!
           </button>
         </div>
 
