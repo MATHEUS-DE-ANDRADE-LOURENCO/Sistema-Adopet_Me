@@ -1,5 +1,6 @@
 package com.adopetme.security;
 
+import io.jsonwebtoken.io.Decoders;
 import com.adopetme.config.AppProperties; // Importe a classe que acabamos de criar
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -22,9 +23,9 @@ public class JwtTokenProvider {
 
     // Converte a chave secreta em um objeto Key
     private Key key() {
-        // Acessa o segredo do JWT da AppProperties
         String jwtSecret = appProperties.getJwt().getSecret();
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String getEmailFromJWT(String token) {

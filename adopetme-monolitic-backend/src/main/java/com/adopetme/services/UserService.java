@@ -30,6 +30,8 @@ public class UserService {
             User newUser = new User();
             newUser.setEmail(email);
             
+            newUser.setLogin(email); 
+            newUser.setNome(email.split("@")[0]); // Pega o nome (ex: "danilo")
             newUser.setSenha(passwordEncoder.encode("OAUTH2_USER_NO_PASSWORD_" + email)); // Era setPassword
             newUser.setTipoUsuario("USER"); // Era setRole
             
@@ -37,4 +39,3 @@ public class UserService {
         }
     }
 }
-

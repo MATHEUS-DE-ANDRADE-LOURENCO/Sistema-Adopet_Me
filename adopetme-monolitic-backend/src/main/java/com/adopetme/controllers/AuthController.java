@@ -1,5 +1,6 @@
 package com.adopetme.controllers;
 
+import com.adopetme.dtos.LoginRequest;
 import com.adopetme.models.User;
 import com.adopetme.repositories.UserRepository;
 import com.adopetme.security.JwtTokenProvider;
@@ -31,25 +32,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User loginData) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginData) {
         Optional<User> user = userRepository.findByEmail(loginData.getEmail());
 
-        if(user.isEmpty()) {
+        if (user.isEmpty()) {
             return ResponseEntity.status(404).body("Usuário não encontrado...");
         }
 
-        // Use a senha do User na injeção (agora que o passwordEncoder é um Bean)
-        if (!passwordEncoder.matches(loginData.getPassword(), user.get().getPassword())) {
+        if (!passwordEncoder.matches(loginData.getSenha(), user.get().getSenha())) {
             return ResponseEntity.status(401).body("Senha incorreta...");
         }
 
-        // 🚨 NOVO: Se o login for bem-sucedido, gere o JWT
         String jwtToken = jwtTokenProvider.generateToken(user.get().getEmail());
-
-        // 🚨 Retorna o token e a mensagem para o frontend
         return ResponseEntity.ok(new AuthResponse(jwtToken, "Login realizado com sucesso!"));
     }
-
     /**
      * Classe auxiliar para estruturar a resposta JSON enviada ao cliente.
      */

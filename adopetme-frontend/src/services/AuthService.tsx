@@ -8,7 +8,7 @@ export interface LoginResponse {
   message: string;
 }
 
-export async function login(email: string, password: string): Promise<LoginResponse> {
+export async function login(email: string, senha: string): Promise<LoginResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
@@ -16,7 +16,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
         "Content-Type": "application/json",
       },
       // O corpo da requisição é exatamente o que o Postman provou ser funcional:
-      body: JSON.stringify({ email, password }), 
+      body: JSON.stringify({ email, senha }), 
     });
 
     // Se o backend retornou 200 OK, continue.
