@@ -37,7 +37,8 @@ const Navbar: React.FC = () => {
     let specificLinks = [];
     if (userRole === 'ADMIN_ONG') {
         specificLinks = ongLinks;
-    } else if (userRole === 'USER') { // "USER" é o tutor padrão
+    } else { 
+        // "Buscar Pets" agora é padrão para tutores E usuários deslogados
         specificLinks = tutorLinks;
     }
     
@@ -48,9 +49,14 @@ const Navbar: React.FC = () => {
         { name: "Denúncias", href: "/report", icon: FilePenLine },
         { name: "Sobre nós", href: "/about-us", icon: Info }
     ];
+    
+    // Remove duplicatas se "Buscar Pets" já foi adicionado
+    if (userRole === 'ADMIN_ONG') {
+        return links.filter(link => link.name !== 'Buscar Pets');
+    }
     return links;
 
-  }, [userRole, session]); // Recalcula os links se a userRole ou session mudar
+  }, [userRole]); // Recalcula os links se a userRole mudar
 
   const baseClasses =
     "no-underline !text-neutral-50 visited:!text-neutral-50 hover:!text-gray-200 focus:!text-neutral-50 active:!text-neutral-50 font-medium transition duration-150 p-2 rounded-lg flex items-center gap-1.5";
@@ -71,8 +77,11 @@ const Navbar: React.FC = () => {
         {/* 5. Renderiza os links dinâmicos */}
         <div className="hidden sm:flex space-x-6 items-center">
           {navLinks.map((link) => (
-            // Esconde links específicos se não estiver logado
-            (session === 'LOGGED_IN' || !['Buscar Pets', 'Registrar Pet', 'Gerenciar ONG'].includes(link.name)) ? (
+            // ==========================================================
+            // MUDANÇA AQUI:
+            // "Buscar Pets" foi removido da lista de links restritos.
+            // ==========================================================
+            (session === 'LOGGED_IN' || !['Registrar Pet', 'Gerenciar ONG'].includes(link.name)) ? (
                 <NavLink
                 key={link.name}
                 to={link.href}

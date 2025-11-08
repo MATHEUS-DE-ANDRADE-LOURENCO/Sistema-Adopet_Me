@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional; // 1. IMPORTAR OPTIONAL
 
 @RestController
 @RequestMapping("/api/pets") // Prefixo /api para clareza
@@ -38,6 +39,25 @@ public class PetController {
         List<Pet> pets = petRepository.findAll();
         return ResponseEntity.ok(pets);
     }
+
+    /**
+     * ==========================================================
+     * 2. NOVO ENDPOINT ADICIONADO
+     * ==========================================================
+     * Endpoint PÚBLICO para buscar um pet específico pelo ID.
+     * Usado pela página de "Detalhes do Pet".
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Pet> getPetById(@PathVariable Integer id) {
+        Optional<Pet> pet = petRepository.findById(id);
+        
+        if (pet.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        return ResponseEntity.ok(pet.get());
+    }
+
 
     /**
      * Endpoint SEGURO para ONGs registrarem novos pets.
@@ -72,7 +92,15 @@ public class PetController {
             newPet.setStatus(petRequest.getStatus() != null ? petRequest.getStatus() : "Disponível");
             newPet.setDtCadastro(OffsetDateTime.now());
 
-            // 4. Salva o Pet no banco
+            // ==========================================================
+            // 4. ATUALIZAÇÃO: Mapeando os novos campos
+            // ==========================================================
+            newPet.setNinhada(petRequest.getNinhada());
+            newPet.setCastracao(petRequest.getCastracao());
+            newPet.setDtNascimento(petRequest.getDtNascimento());
+
+
+            // 5. Salva o Pet no banco
             Pet savedPet = petRepository.save(newPet);
             
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPet);

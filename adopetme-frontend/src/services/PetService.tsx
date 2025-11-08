@@ -3,7 +3,9 @@ import { Pet } from "../models/PetModel"; // Vamos reutilizar o modelo existente
 
 const API_BASE_URL = "http://localhost:8081/api"; // API_BASE_URL atualizado
 
-// Tipo para os dados do formulário de registro
+// ==========================================================
+// 1. ATUALIZAÇÃO DA INTERFACE
+// ==========================================================
 export interface PetRegistrationData {
     nome: string;
     especie: string;
@@ -11,7 +13,42 @@ export interface PetRegistrationData {
     idade: number;
     descricao: string;
     status?: string;
+
+    // NOVOS CAMPOS
+    ninhada?: string;
+    castracao: boolean; // Mudar para boolean
+    dtNascimento?: string; // Enviar como string "YYYY-MM-DD"
 }
+
+/**
+ * ==========================================================
+ * 2. NOVA FUNÇÃO ADICIONADA
+ * ==========================================================
+ * Busca um pet específico pelo ID (para Tutores)
+ */
+export async function getPetById(id: number): Promise<Pet> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/pets/${id}`);
+
+    if (!response.ok) {
+        if (response.status === 404) {
+            throw new Error("Pet não encontrado.");
+        }
+        throw new Error(`Erro de rede: ${response.status}`);
+    }
+    
+    const data: Pet = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error("Falha ao buscar pet por ID:", error);
+    if (error instanceof TypeError) {
+        throw new Error("Não foi possível conectar ao servidor.");
+    }
+    throw error;
+  }
+}
+
 
 /**
  * Busca todos os pets (para Tutores)
