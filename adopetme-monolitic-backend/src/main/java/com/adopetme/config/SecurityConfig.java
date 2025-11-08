@@ -66,12 +66,16 @@ public class SecurityConfig {
                         ).permitAll()
                         
                         // ==========================================================
-                        // MUDANÇA AQUI:
-                        // Liberar listagem (pets) e detalhes (pets/**) para todos
+                        // CORREÇÃO DO BUG DE CORS (PREFLIGHT) APLICADA AQUI
                         // ==========================================================
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                        
+                        // ==========================================================
+                        
+                        // Liberar listagem (pets) e detalhes (pets/**) para todos
                         .requestMatchers(HttpMethod.GET, "/api/pets", "/api/pets/**").permitAll() 
                         
-                        // 4. PROTEGER registro de pets (POST) apenas para ADMIN_ONG
+                        // PROTEGER registro de pets (POST) apenas para ADMIN_ONG
                         .requestMatchers(HttpMethod.POST, "/api/pets/register").hasRole("ADMIN_ONG") 
                         
                         .anyRequest().authenticated()

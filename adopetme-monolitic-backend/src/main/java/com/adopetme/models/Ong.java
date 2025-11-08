@@ -1,5 +1,7 @@
 package com.adopetme.models;
 
+// --- IMPORT NECESSÁRIO ---
+import com.fasterxml.jackson.annotation.JsonIgnore; 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -33,9 +35,13 @@ public class Ong {
     @Column(name = "dt_registro")
     private OffsetDateTime dtRegistro;
 
+    // --- CORREÇÃO 3 (O ERRO DO SEU ÚLTIMO LOG) ---
+    @JsonIgnore // Impede que o Jackson serialize esta lista (evita LazyInitializationException)
     @OneToMany(mappedBy = "ong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> usuarios;
 
+    // --- CORREÇÃO 4 (PREVENTIVA, MESMO PROBLEMA) ---
+    @JsonIgnore // Impede que o Jackson serialize esta lista (evita LazyInitializationException)
     @OneToMany(mappedBy = "ong", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets;
 

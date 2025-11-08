@@ -1,5 +1,6 @@
 package com.adopetme.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // <-- IMPORTAR
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.time.LocalDate;
@@ -14,7 +15,7 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY) // Adicionado LAZY para performance
+    @ManyToOne(optional = false, fetch = FetchType.EAGER) // Correção anterior (Manter)
     @JoinColumn(name = "id_ong", nullable = false, foreignKey = @ForeignKey(name = "fk_pet_ong"))
     private Ong ong;
 
@@ -36,9 +37,14 @@ public class Pet {
     @Column(name = "dt_cadastro")
     private OffsetDateTime dtCadastro;
 
+    // ==========================================================
+    // CORREÇÃO DO NOVO LOG APLICADA AQUI
+    // ==========================================================
+    @JsonIgnore // Impede que o Jackson serialize esta lista
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PetFoto> fotos;
 
+    @JsonIgnore // Impede que o Jackson serialize esta lista
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorito> favoritos;
 

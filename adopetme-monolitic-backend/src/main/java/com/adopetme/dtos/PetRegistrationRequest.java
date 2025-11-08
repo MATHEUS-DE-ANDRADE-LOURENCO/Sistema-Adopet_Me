@@ -15,9 +15,6 @@ public class PetRegistrationRequest {
     private String descricao;
     private String status = "Disponível"; // Padrão
     
-    // ==========================================================
-    // 2. NOVOS CAMPOS ADICIONADOS
-    // ==========================================================
     private String ninhada; // Pode ser nulo
     private Boolean castracao;
     private LocalDate dtNascimento; // Pode ser nulo
