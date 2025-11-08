@@ -1,3 +1,4 @@
+// adopetme-monolitic-backend/src/main/java/com/adopetme/config/SecurityConfig.java
 package com.adopetme.config;
 
 import com.adopetme.security.CustomUserDetailsService;
@@ -6,6 +7,7 @@ import com.adopetme.security.JwtAuthenticationFilter;
 import com.adopetme.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // 1. Importar HttpMethod
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -59,8 +61,16 @@ public class SecurityConfig {
                                 "/h2-console/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api/auth/**" // 2. Liberar /api/auth
                         ).permitAll()
+                        
+                        // 3. PERMITIR listagem de pets (GET) para todos
+                        .requestMatchers(HttpMethod.GET, "/api/pets").permitAll() 
+                        
+                        // 4. PROTEGER registro de pets (POST) apenas para ADMIN_ONG
+                        .requestMatchers(HttpMethod.POST, "/api/pets/register").hasRole("ADMIN_ONG") 
+                        
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

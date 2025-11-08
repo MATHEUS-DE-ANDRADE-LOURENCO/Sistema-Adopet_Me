@@ -1,3 +1,4 @@
+// adopetme-monolitic-backend/src/main/java/com/adopetme/controllers/AuthController.java
 package com.adopetme.controllers;
 
 import com.adopetme.dtos.LoginRequest;
@@ -15,7 +16,7 @@ import java.util.Optional;
 import java.util.Map; // 3. Importar Map
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth") // MUDANÇA: Prefixo /api adicionado
 @CrossOrigin(origins = "*") // Permite chamadas do frontend
 public class AuthController {
 
@@ -46,15 +47,18 @@ public class AuthController {
             return ResponseEntity.status(401).body("Senha incorreta...");
         }
 
+        // MUDANÇA: Gera o token E captura a role
         String jwtToken = jwtTokenProvider.generateToken(user.get().getEmail());
-        return ResponseEntity.ok(new AuthResponse(jwtToken, "Login realizado com sucesso!"));
+        String userRole = user.get().getTipoUsuario(); // Ex: "USER" ou "ADMIN_ONG"
+
+        // MUDANÇA: Retorna o token, a mensagem E a userRole
+        return ResponseEntity.ok(new AuthResponse(jwtToken, "Login realizado com sucesso!", userRole));
     }
 
     /**
      * ==========================================================
-     * NOVO ENDPOINT DE REGISTRO
+     * ENDPOINT DE REGISTRO
      * ==========================================================
-     * Este método recebe os dados do formulário de registro do frontend.
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> registerData) {
@@ -67,6 +71,8 @@ public class AuthController {
         }
 
         try {
+            String userRole; // Variável para guardar a role criada
+
             if ("ONG".equals(tipoUsuario)) {
                 // --- Lógica de Registro de ONG ---
 
@@ -76,19 +82,20 @@ public class AuthController {
                 newOng.setEmail(email);
                 newOng.setTelefone(registerData.get("telefone"));
                 newOng.setEndereco(registerData.get("endereco"));
-                // (Você pode adicionar outros campos da ONG aqui, como cidade, estado, etc.)
+                
                 Ong savedOng = ongRepository.save(newOng);
 
                 // 3. Cria o Usuário (admin da ONG) e associa à ONG
                 User newUser = new User();
                 newUser.setEmail(email);
                 newUser.setLogin(email);
-                newUser.setNome(registerData.get("nomeOng")); // Nome do usuário = nome da ONG
+                newUser.setNome(registerData.get("nomeOng"));
                 newUser.setSenha(passwordEncoder.encode(registerData.get("senha")));
-                newUser.setTipoUsuario("ADMIN_ONG"); // Ou qualquer role que você usa para ONGs
+                newUser.setTipoUsuario("ADMIN_ONG"); // Role específica de admin de ONG
                 newUser.setOng(savedOng); // Associa o usuário à ONG
                 
                 userRepository.save(newUser);
+                userRole = "ADMIN_ONG";
 
             } else {
                 // --- Lógica de Registro de TUTOR (Usuário Padrão) ---
@@ -101,9 +108,11 @@ public class AuthController {
                 newUser.setTipoUsuario("USER"); // Role padrão para tutores
                 
                 userRepository.save(newUser);
+                userRole = "USER";
             }
 
-            return ResponseEntity.ok(new AuthResponse(null, "Registro realizado com sucesso!"));
+            // MUDANÇA: Retorna a role (útil para consistência)
+            return ResponseEntity.ok(new AuthResponse(null, "Registro realizado com sucesso!", userRole));
 
         } catch (Exception e) {
             // Captura qualquer erro inesperado durante o salvamento
@@ -118,10 +127,17 @@ public class AuthController {
     public static class AuthResponse {
         public String token;
         public String message;
+        public String userRole; // Campo para a role
 
-        public AuthResponse(String token, String message) {
+        public AuthResponse(String token, String message, String userRole) {
             this.token = token;
             this.message = message;
+            this.userRole = userRole;
+        }
+        
+        // Sobrecarga para o registro (que não retorna token)
+         public AuthResponse(String token, String message) {
+            this(token, message, null);
         }
     }
 }

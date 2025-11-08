@@ -1,3 +1,4 @@
+// adopetme-monolitic-backend/src/main/java/com/adopetme/controllers/TestController.java
 package com.adopetme.controllers;
 
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.stream.Collectors; // Necessário para coletar as Roles
 
 @RestController
-@RequestMapping("/test") // Recomendo manter o '/test' para clareza
+@RequestMapping("/api/test") // MUDANÇA AQUI
 public class TestController {
 
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);

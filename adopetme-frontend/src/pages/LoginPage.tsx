@@ -1,4 +1,4 @@
-// adopetme-frontend/src/pages/LoginPage.tsx (MODIFICADO - VERSÃO FINAL DE INTEGRAÇÃO)
+// adopetme-frontend/src/pages/LoginPage.tsx
 
 import React, { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ import { FaPaw, FaUsers } from 'react-icons/fa';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { setSession } = useSession(); 
+  const { setSession } = useSession(); // Pega o setSession atualizado
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,6 +20,8 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null);
 
+  // Este seletor local serve como um "lembrete" visual para o usuário
+  // A "role" real virá do backend após o login
   const [localSelection, setLocalSelection] = useState<'TUTOR' | 'ONG'>('TUTOR');
   
   const handleLogin = async (e: FormEvent) => {
@@ -28,9 +30,16 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const { token } = await login(email, password); 
-      setSession('LOGGED_IN', token, email);
-      localStorage.setItem("user_role_mock", localSelection);
+      // 1. A API agora retorna { token, message, userRole }
+      const { token, userRole } = await login(email, password); 
+      
+      // 2. Salva a role vinda da API na sessão
+      // O 'localSelection' é um fallback caso a API falhe em retornar a role
+      const roleToSave = userRole || (localSelection === 'ONG' ? 'ADMIN_ONG' : 'USER');
+      
+      // 3. Salva token, email E role no contexto
+      setSession('LOGGED_IN', token, email, roleToSave); 
+      
       navigate("/");
     } catch (error) {
       if (error instanceof Error) {
@@ -44,6 +53,7 @@ const LoginPage: React.FC = () => {
   };
 
   const handleGoogleRedirect = () => {
+    // ATENÇÃO: O endpoint de OAuth NÃO está sob /api
     window.location.href = "http://localhost:8081/oauth2/authorization/google";
   }
 
@@ -58,7 +68,7 @@ const LoginPage: React.FC = () => {
         <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
           <h1 className="text-2xl font-bold text-center mb-6 text-black">Bem-Vindo de Volta!</h1>
 
-          {/* Botões de Seleção de Perfil (COM CONTRASTE CORRIGIDO) */}
+          {/* Botões de Seleção de Perfil */}
           <div className="flex items-center justify-center gap-6 mb-6">
               <button
                   type="button"
@@ -70,7 +80,7 @@ const LoginPage: React.FC = () => {
                   }`}
               >
                   <FaUsers className="w-5 h-5" />
-                  <span className="font-semibold">ONG</span>
+                  <span className="font-semibold">Sou uma ONG</span>
               </button>
               <button
                   type="button"
@@ -82,7 +92,7 @@ const LoginPage: React.FC = () => {
                   }`}
               >
                   <FaPaw className="w-5 h-5" />
-                  <span className="font-semibold">Tutor</span>
+                  <span className="font-semibold">Sou um Tutor</span>
               </button>
           </div>
           
@@ -146,7 +156,7 @@ const LoginPage: React.FC = () => {
             Não tem uma conta?{" "}
             <span
               className="text-yellow-600 hover:underline cursor-pointer"
-              onClick={() => navigate("/register")} // Verifique se o caminho é /register ou /registro
+              onClick={() => navigate("/register")}
             >
               Registre-se
             </span>
