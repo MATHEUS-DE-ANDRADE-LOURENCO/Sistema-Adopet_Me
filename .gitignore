@@ -31,5 +31,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Arquivos de Upload (Backend)
+/adopetme-monolitic-backend/uploads/
+
 ### VS Code ###
 .vscode/
