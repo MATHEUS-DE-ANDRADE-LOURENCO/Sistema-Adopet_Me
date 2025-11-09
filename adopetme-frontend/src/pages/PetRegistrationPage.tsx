@@ -3,10 +3,10 @@ import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-// 1. Importar ícone de upload
 import { Loader2, PawPrint, Upload } from 'lucide-react';
 import { useSession } from '../context/SessionContext';
-import { registerPet, PetRegistrationData } from '../services/PetService'; // Criaremos este serviço
+// 1. Importar uploadPetPhoto
+import { registerPet, PetRegistrationData, uploadPetPhoto } from '../services/PetService'; 
 
 const PetRegistrationPage: React.FC = () => {
     const navigate = useNavigate();
@@ -25,8 +25,8 @@ const PetRegistrationPage: React.FC = () => {
         dtNascimento: ''
     });
     
-    // 3. Estado para o nome do arquivo (apenas visual)
-    const [fileName, setFileName] = useState<string | null>(null);
+    // 3. Estado para o ARQUIVO (File), não apenas o nome
+    const [file, setFile] = useState<File | null>(null);
     
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -57,18 +57,16 @@ const PetRegistrationPage: React.FC = () => {
         }
     };
 
-    // 5. Handler para o input de arquivo (apenas visual)
+    // 5. Handler para o input de arquivo (agora salva o File)
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFileName(e.target.files[0].name);
-            // NOTA: A lógica de upload real (para S3/Cloudinary)
-            // ocorreria aqui, ANTES do handleSubmit.
-            // Por enquanto, apenas atualizamos o nome do arquivo.
+            setFile(e.target.files[0]);
         } else {
-            setFileName(null);
+            setFile(null);
         }
     };
 
+    // 6. handleSubmit ATUALIZADO (Etapa 1: Texto, Etapa 2: Foto)
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -82,13 +80,19 @@ const PetRegistrationPage: React.FC = () => {
         setLoading(true);
 
         try {
-            // 6. Garantir que dtNascimento seja nulo se vazio
+            // Etapa 1: Registrar o Pet (dados de texto)
             const dataToSubmit: PetRegistrationData = {
                 ...formData,
                 dtNascimento: formData.dtNascimento === '' ? undefined : formData.dtNascimento
             };
+            const savedPet = await registerPet(dataToSubmit, token); //
+            
+            // Etapa 2: Se o registro funcionou E existe um arquivo, faz o upload
+            if (savedPet && savedPet.id && file) {
+                setSuccess("Pet registrado, enviando foto..."); // Feedback para o usuário
+                await uploadPetPhoto(savedPet.id, file, token); //
+            }
 
-            await registerPet(dataToSubmit, token);
             setSuccess("Pet registrado com sucesso!");
             
             // 7. Limpar o formulário completo
@@ -103,7 +107,7 @@ const PetRegistrationPage: React.FC = () => {
                 castracao: false,
                 dtNascimento: ''
             });
-            setFileName(null); // Limpar nome do arquivo
+            setFile(null); // Limpar o arquivo
 
         } catch (err) {
             if (err instanceof Error) {
@@ -260,23 +264,22 @@ const PetRegistrationPage: React.FC = () => {
                         
                         {/* Upload de Foto (NOVO) */}
                         <div>
-                            <label className={labelStyle}>Fotos do Pet (Opcional)</label>
+                            <label className={labelStyle}>Foto Principal do Pet</label>
                             <label htmlFor="fotos" className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                                 <Upload className="w-5 h-5 text-gray-500" />
                                 <span className="text-neutral-700">
-                                    {fileName || "Clique para selecionar fotos"}
+                                    {/* 10. Exibe o nome do arquivo (file.name) */}
+                                    {file ? file.name : "Clique para selecionar foto"}
                                 </span>
                             </label>
                             <input
                                 type="file"
                                 name="fotos"
                                 id="fotos"
-                                multiple // Permite múltiplas fotos
+                                accept="image/png, image/jpeg, image/webp" // Aceita apenas imagens
                                 onChange={handleFileChange}
                                 className="hidden"
-                                // Nota: Este input é 'não controlado' (não usa 'value')
                             />
-                            <p className="text-xs text-gray-500 mt-1">O upload real das fotos é um passo futuro complexo.</p>
                         </div>
 
 

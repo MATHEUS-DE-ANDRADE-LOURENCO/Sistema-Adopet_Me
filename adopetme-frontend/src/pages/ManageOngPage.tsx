@@ -1,6 +1,5 @@
 // adopetme-frontend/src/pages/ManageOngPage.tsx
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-// 1. Importar useNavigate
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -9,12 +8,14 @@ import { Ong } from '../models/OngModel';
 import { Pet } from '../models/PetModel';
 import { getMyOngDetails, updateMyOngDetails } from '../services/OngService';
 import * as PetService from '../services/PetService';
-import { Loader2, User, Home, PawPrint, Edit, Trash2 } from 'lucide-react';
+import { Loader2, User, Home, PawPrint, Edit, Trash2, ImageOff } from 'lucide-react'; // Importar ImageOff
+
+const API_HOST = "http://localhost:8081"; // URL do Backend
 
 type Tab = 'ong' | 'pets';
 
 const ManageOngPage: React.FC = () => {
-    const navigate = useNavigate(); // 2. Instanciar o navigate
+    const navigate = useNavigate();
     const { token, userRole } = useSession();
     
     const [tab, setTab] = useState<Tab>('ong');
@@ -31,23 +32,23 @@ const ManageOngPage: React.FC = () => {
     const [loadingPets, setLoadingPets] = useState(false);
     const [petError, setPetError] = useState<string | null>(null);
 
-    // ... (useEffect de redirecionamento) ...
+    // 1. Redireciona se não for ONG
     useEffect(() => {
         if (userRole && userRole !== 'ADMIN_ONG') {
             navigate('/');
         }
     }, [userRole, navigate]);
 
-    // ... (useEffect de busca de dados) ...
+    // 2. Busca os dados iniciais (Detalhes da ONG)
     useEffect(() => {
         if (token && tab === 'ong') {
             loadOngData();
         } else if (token && tab === 'pets') {
             loadPetData();
         }
-    }, [token, tab]); 
+    }, [token, tab]); // Recarrega os dados quando a aba muda
 
-    // ... (loadOngData) ...
+    // --- Funções de Carregamento ---
     const loadOngData = async () => {
         if (!token) return;
         setLoading(true);
@@ -62,7 +63,6 @@ const ManageOngPage: React.FC = () => {
         }
     };
 
-    // ... (loadPetData) ...
     const loadPetData = async () => {
         if (!token) return;
         setLoadingPets(true);
@@ -78,7 +78,7 @@ const ManageOngPage: React.FC = () => {
     };
 
 
-    // ... (handleOngChange) ...
+    // --- Handlers da ONG ---
     const handleOngChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setOngData({
             ...ongData,
@@ -86,7 +86,6 @@ const ManageOngPage: React.FC = () => {
         });
     };
 
-    // ... (handleOngSubmit) ...
     const handleOngSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (!token) return;
@@ -106,10 +105,8 @@ const ManageOngPage: React.FC = () => {
     };
 
     // --- Handlers dos Pets ---
-
-    // 3. MUDANÇA AQUI
     const handleEditPet = (petId: number) => {
-        // MUDADO de alert() para navigate()
+        // Navega para a página de edição
         navigate(`/edit-pet/${petId}`);
     };
 
@@ -130,7 +127,7 @@ const ManageOngPage: React.FC = () => {
         }
     };
 
-    // ... (Estilos) ...
+    // --- Estilos ---
     const inputStyle = "border-2 border-yellow-600/50 p-3 rounded focus:outline-none text-black placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500 w-full";
     const labelStyle = "text-sm font-semibold text-neutral-700 mb-1";
     const tabStyle = (active: boolean) => 
@@ -231,37 +228,51 @@ const ManageOngPage: React.FC = () => {
                                 ) : pets.length === 0 ? (
                                     <p className="text-gray-500 text-center">Nenhum pet registrado ainda.</p>
                                 ) : (
-                                    pets.map(pet => (
-                                        <div key={pet.id} className="flex items-center justify-between p-4 border rounded-lg shadow-sm">
-                                            <div className="flex items-center gap-4">
-                                                <img 
-                                                    src={`https://place-puppy.com/60x60?image=${pet.id}`} // Placeholder
-                                                    alt={pet.nome}
-                                                    className="w-16 h-16 rounded-md object-cover"
-                                                />
-                                                <div>
-                                                    <h3 className="text-lg font-bold text-black">{pet.nome}</h3>
-                                                    <span className="text-sm text-gray-600">{pet.especie} | {pet.status}</span>
+                                    pets.map(pet => {
+                                        // Monta a URL da imagem
+                                        const imageUrl = pet.fotoUrl ? `${API_HOST}${pet.fotoUrl}` : null;
+                                        
+                                        return (
+                                            <div key={pet.id} className="flex items-center justify-between p-4 border rounded-lg shadow-sm">
+                                                <div className="flex items-center gap-4">
+                                                    
+                                                    {/* Lógica de exibição da imagem */}
+                                                    {imageUrl ? (
+                                                        <img 
+                                                            src={imageUrl}
+                                                            alt={pet.nome}
+                                                            className="w-16 h-16 rounded-md object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-16 h-16 rounded-md bg-gray-100 flex items-center justify-center text-gray-400">
+                                                            <ImageOff size={24} />
+                                                        </div>
+                                                    )}
+
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-black">{pet.nome}</h3>
+                                                        <span className="text-sm text-gray-600">{pet.especie} | {pet.status}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button 
+                                                        onClick={() => handleEditPet(pet.id)}
+                                                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
+                                                        title="Editar Pet"
+                                                    >
+                                                        <Edit className="w-5 h-5" />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDeletePet(pet.id)}
+                                                        className="p-2 text-red-600 hover:bg-red-100 rounded-full"
+                                                        title="Deletar Pet"
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2">
-                                                <button 
-                                                    onClick={() => handleEditPet(pet.id)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
-                                                    title="Editar Pet"
-                                                >
-                                                    <Edit className="w-5 h-5" />
-                                                </button>
-                                                <button 
-                                                    onClick={() => handleDeletePet(pet.id)}
-                                                    className="p-2 text-red-600 hover:bg-red-100 rounded-full"
-                                                    title="Deletar Pet"
-                                                >
-                                                    <Trash2 className="w-5 h-5" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 )}
                             </div>
                         </div>

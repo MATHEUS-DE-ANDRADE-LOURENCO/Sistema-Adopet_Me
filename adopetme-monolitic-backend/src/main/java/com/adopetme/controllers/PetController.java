@@ -15,9 +15,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
+import java.util.stream.Collectors;
 import java.util.List;
-import java.util.Optional; // 1. IMPORTAR OPTIONAL
-import java.util.stream.Collectors; // <-- ADICIONE ESTE IMPORT
+import java.util.Optional;
+
+// --- IMPORTAÇÕES QUE FALTAVAM ---
+import com.adopetme.repositories.PetFotoRepository;
+import com.adopetme.models.PetFoto;
+// --- FIM DAS IMPORTAÇÕES QUE FALTAVAM ---
+
 
 @RestController
 @RequestMapping("/api/pets") // Prefixo /api para clareza
@@ -30,39 +36,41 @@ public class PetController {
     @Autowired
     private UserRepository userRepository;
 
+    // --- VARIÁVEL QUE FALTAVA (INJEÇÃO DE DEPENDÊNCIA) ---
+    @Autowired
+    private PetFotoRepository petFotoRepository;
+
     /**
      * Endpoint PÚBLICO para listar todos os pets disponíveis.
-     * Usado pela página "Buscar Pets" dos Tutores.
      */
     @GetMapping
     public ResponseEntity<List<Pet>> getAllPets() {
-        // No futuro, você pode querer filtrar por status "Disponível"
         List<Pet> pets = petRepository.findAll();
+        // Para cada pet, busca sua foto principal
+        pets.forEach(this::setPrincipalFotoUrl); 
         return ResponseEntity.ok(pets);
     }
 
     /**
-     * ==========================================================
-     * 2. NOVO ENDPOINT ADICIONADO
-     * ==========================================================
      * Endpoint PÚBLICO para buscar um pet específico pelo ID.
-     * Usado pela página de "Detalhes do Pet".
      */
     @GetMapping("/{id}")
     public ResponseEntity<Pet> getPetById(@PathVariable Integer id) {
-        Optional<Pet> pet = petRepository.findById(id);
+        Optional<Pet> petOpt = petRepository.findById(id);
         
-        if (pet.isEmpty()) {
+        if (petOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         
-        return ResponseEntity.ok(pet.get());
+        Pet pet = petOpt.get();
+        // Busca a foto principal do pet
+        setPrincipalFotoUrl(pet); 
+        return ResponseEntity.ok(pet);
     }
 
 
     /**
      * Endpoint SEGURO para ONGs registrarem novos pets.
-     * Usado pela nova página "Registro de Pets".
      */
     @PostMapping("/register")
     public ResponseEntity<?> registerPet(@RequestBody PetRegistrationRequest petRequest, Authentication authentication) {
@@ -72,9 +80,7 @@ public class PetController {
 
         try {
             // 1. Encontra o usuário (admin da ONG) que está logado
-            String userEmail = authentication.getName();
-            User adminOngUser = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+            User adminOngUser = findUserByAuth(authentication);
 
             // 2. Verifica se este usuário está associado a uma ONG
             Ong ong = adminOngUser.getOng();
@@ -92,10 +98,6 @@ public class PetController {
             newPet.setDescricao(petRequest.getDescricao());
             newPet.setStatus(petRequest.getStatus() != null ? petRequest.getStatus() : "Disponível");
             newPet.setDtCadastro(OffsetDateTime.now());
-
-            // ==========================================================
-            // 4. ATUALIZAÇÃO: Mapeando os novos campos
-            // ==========================================================
             newPet.setNinhada(petRequest.getNinhada());
             newPet.setCastracao(petRequest.getCastracao());
             newPet.setDtNascimento(petRequest.getDtNascimento());
@@ -114,7 +116,7 @@ public class PetController {
     }
     
     // ==========================================================
-    // NOVOS MÉTODOS DE GERENCIAMENTO DE PETS
+    // MÉTODOS DE GERENCIAMENTO DE PETS
     // ==========================================================
 
     /**
@@ -130,15 +132,16 @@ public class PetController {
             User adminOngUser = findUserByAuth(authentication);
             Ong ong = adminOngUser.getOng();
             if (ong == null) {
-                // Se o usuário não é de ONG, retorna lista vazia
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(List.of());
             }
 
             // Busca todos os pets e filtra apenas os da ONG do usuário
-            // Em uma aplicação maior, faríamos isso com uma query customizada no repositório
             List<Pet> ongPets = petRepository.findAll().stream()
                     .filter(pet -> pet.getOng().getId().equals(ong.getId()))
                     .collect(Collectors.toList());
+            
+            // Adiciona a URL da foto para cada pet da lista
+            ongPets.forEach(this::setPrincipalFotoUrl);
             
             return ResponseEntity.ok(ongPets);
 
@@ -171,7 +174,6 @@ public class PetController {
             pet.setNinhada(petRequest.getNinhada());
             pet.setCastracao(petRequest.getCastracao());
             pet.setDtNascimento(petRequest.getDtNascimento());
-            // dtCadastro e ong não mudam
 
             Pet savedPet = petRepository.save(pet);
             return ResponseEntity.ok(savedPet);
@@ -179,10 +181,8 @@ public class PetController {
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (IllegalAccessException e) {
-            // Se o pet não pertencer à ONG
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (RuntimeException e) {
-            // Se o pet não for encontrado (do verifyPetOwnership)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
@@ -212,7 +212,7 @@ public class PetController {
 
 
     // ==========================================================
-    // MÉTODOS AUXILIARES (REPETIDOS DO OngController)
+    // MÉTODOS AUXILIARES
     // ==========================================================
 
     private User findUserByAuth(Authentication authentication) {
@@ -221,12 +221,6 @@ public class PetController {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
     
-    /**
-     * Verifica se o pet (pelo id) pertence à ONG do usuário logado.
-     * @return O objeto Pet se a posse for verificada.
-     * @throws RuntimeException Se o pet não for encontrado.
-     * @throws IllegalAccessException Se o pet não pertencer à ONG do usuário.
-     */
     private Pet verifyPetOwnership(Integer petId, User adminOngUser) throws IllegalAccessException {
         Ong ong = adminOngUser.getOng();
         if (ong == null) {
@@ -236,11 +230,23 @@ public class PetController {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new RuntimeException("Pet não encontrado com ID: " + petId));
 
-        // Ponto crucial de segurança:
         if (!pet.getOng().getId().equals(ong.getId())) {
             throw new IllegalAccessException("Acesso negado. Este pet não pertence à sua ONG.");
         }
         
         return pet;
+    }
+    
+    /**
+     * Busca a foto principal de um pet e a define no campo 'fotoUrl'
+     */
+    private void setPrincipalFotoUrl(Pet pet) {
+        // Tenta encontrar uma foto marcada como "principal"
+        // Esta é a linha que estava dando o erro de compilação
+        Optional<PetFoto> fotoOpt = petFotoRepository.findFirstByPetAndFtPrincipal(pet, true);
+        
+        if (fotoOpt.isPresent()) {
+            pet.setFotoUrl(fotoOpt.get().getUrl());
+        }
     }
 }

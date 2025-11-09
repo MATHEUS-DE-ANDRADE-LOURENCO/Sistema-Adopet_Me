@@ -69,11 +69,14 @@ public class SecurityConfig {
                         // CORREÇÃO DO BUG DE CORS (PREFLIGHT) APLICADA AQUI
                         // ==========================================================
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
-                        
                         // (Da etapa anterior)
                         .requestMatchers(HttpMethod.POST, "/api/report").permitAll() 
                         
                         // ==========================================================
+
+                        // --- PERMISSÃO PARA VER FOTOS ---
+                        .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                        
                         
                         // Liberar listagem (pets) e detalhes (pets/**) para todos
                         .requestMatchers(HttpMethod.GET, "/api/pets", "/api/pets/**").permitAll() 

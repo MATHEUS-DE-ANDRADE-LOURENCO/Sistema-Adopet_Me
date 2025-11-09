@@ -1,6 +1,6 @@
 package com.adopetme.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // <-- IMPORTAR
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.time.LocalDate;
@@ -15,7 +15,7 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER) // Correção anterior (Manter)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_ong", nullable = false, foreignKey = @ForeignKey(name = "fk_pet_ong"))
     private Ong ong;
 
@@ -38,18 +38,20 @@ public class Pet {
     private OffsetDateTime dtCadastro;
 
     // ==========================================================
-    // CORREÇÃO DO NOVO LOG APLICADA AQUI
+    // NOVO CAMPO TRANSIENTE - URL da foto principal
     // ==========================================================
-    @JsonIgnore // Impede que o Jackson serialize esta lista
+    @Transient
+    private String fotoUrl; // não é salvo no banco, apenas usado para exibição no JSON
+
+    @JsonIgnore
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PetFoto> fotos;
 
-    @JsonIgnore // Impede que o Jackson serialize esta lista
+    @JsonIgnore
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorito> favoritos;
 
-    public Pet() {
-    }
+    public Pet() {}
 
     @PrePersist
     public void prePersist() {
@@ -58,119 +60,57 @@ public class Pet {
         }
     }
 
-    // Getters e Setters
-    public Integer getId() {
-        return id;
-    }
+    // ==========================================================
+    // GETTERS E SETTERS
+    // ==========================================================
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    public Ong getOng() { return ong; }
+    public void setOng(Ong ong) { this.ong = ong; }
 
-    public Ong getOng() {
-        return ong;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public void setOng(Ong ong) {
-        this.ong = ong;
-    }
+    public String getNinhada() { return ninhada; }
+    public void setNinhada(String ninhada) { this.ninhada = ninhada; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getEspecie() { return especie; }
+    public void setEspecie(String especie) { this.especie = especie; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public String getSexo() { return sexo; }
+    public void setSexo(String sexo) { this.sexo = sexo; }
 
-    public String getNinhada() {
-        return ninhada;
-    }
+    public Integer getIdade() { return idade; }
+    public void setIdade(Integer idade) { this.idade = idade; }
 
-    public void setNinhada(String ninhada) {
-        this.ninhada = ninhada;
-    }
+    public Boolean getCastracao() { return castracao; }
+    public void setCastracao(Boolean castracao) { this.castracao = castracao; }
 
-    public String getEspecie() {
-        return especie;
-    }
+    public LocalDate getDtNascimento() { return dtNascimento; }
+    public void setDtNascimento(LocalDate dtNascimento) { this.dtNascimento = dtNascimento; }
 
-    public void setEspecie(String especie) {
-        this.especie = especie;
-    }
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
 
-    public String getSexo() {
-        return sexo;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setSexo(String sexo) {
-        this.sexo = sexo;
-    }
+    public OffsetDateTime getDtCadastro() { return dtCadastro; }
+    public void setDtCadastro(OffsetDateTime dtCadastro) { this.dtCadastro = dtCadastro; }
 
-    public Integer getIdade() {
-        return idade;
-    }
+    public List<PetFoto> getFotos() { return fotos; }
+    public void setFotos(List<PetFoto> fotos) { this.fotos = fotos; }
 
-    public void setIdade(Integer idade) {
-        this.idade = idade;
-    }
+    public List<Favorito> getFavoritos() { return favoritos; }
+    public void setFavoritos(List<Favorito> favoritos) { this.favoritos = favoritos; }
 
-    public Boolean getCastracao() {
-        return castracao;
-    }
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
 
-    public void setCastracao(Boolean castracao) {
-        this.castracao = castracao;
-    }
-
-    public LocalDate getDtNascimento() {
-        return dtNascimento;
-    }
-
-    public void setDtNascimento(LocalDate dtNascimento) {
-        this.dtNascimento = dtNascimento;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public OffsetDateTime getDtCadastro() {
-        return dtCadastro;
-    }
-
-    public void setDtCadastro(OffsetDateTime dtCadastro) {
-        this.dtCadastro = dtCadastro;
-    }
-
-    public List<PetFoto> getFotos() {
-        return fotos;
-    }
-
-    public void setFotos(List<PetFoto> fotos) {
-        this.fotos = fotos;
-    }
-
-    public List<Favorito> getFavoritos() {
-        return favoritos;
-    }
-
-    public void setFavoritos(List<Favorito> favoritos) {
-        this.favoritos = favoritos;
-    }
-
+    // ==========================================================
+    // EQUALS, HASHCODE E TOSTRING
+    // ==========================================================
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -191,6 +131,7 @@ public class Pet {
                 ", nome='" + nome + '\'' +
                 ", especie='" + especie + '\'' +
                 ", status='" + status + '\'' +
+                ", fotoUrl='" + fotoUrl + '\'' +
                 '}';
     }
 }
