@@ -70,6 +70,9 @@ public class SecurityConfig {
                         // ==========================================================
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
                         
+                        // (Da etapa anterior)
+                        .requestMatchers(HttpMethod.POST, "/api/report").permitAll() 
+                        
                         // ==========================================================
                         
                         // Liberar listagem (pets) e detalhes (pets/**) para todos
@@ -77,6 +80,16 @@ public class SecurityConfig {
                         
                         // PROTEGER registro de pets (POST) apenas para ADMIN_ONG
                         .requestMatchers(HttpMethod.POST, "/api/pets/register").hasRole("ADMIN_ONG") 
+                        
+                        // --- NOVAS REGRAS DE GERENCIAMENTO ---
+                        // Gerenciamento de Pets (PUT, DELETE, /my-ong)
+                        .requestMatchers(HttpMethod.GET, "/api/pets/my-ong").hasRole("ADMIN_ONG")
+                        .requestMatchers(HttpMethod.PUT, "/api/pets/**").hasRole("ADMIN_ONG")
+                        .requestMatchers(HttpMethod.DELETE, "/api/pets/**").hasRole("ADMIN_ONG")
+                        
+                        // Gerenciamento da ONG (somente /api/ong/me)
+                        .requestMatchers("/api/ong/me").hasRole("ADMIN_ONG")
+                        // --- FIM DAS NOVAS REGRAS ---
                         
                         .anyRequest().authenticated()
                 )

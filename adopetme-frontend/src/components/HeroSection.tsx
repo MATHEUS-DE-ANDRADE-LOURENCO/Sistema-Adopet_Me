@@ -1,5 +1,8 @@
+// adopetme-frontend/src/components/HeroSection.tsx
 import React from "react";
 import { PawPrint, Bone, Heart } from "lucide-react";
+// 1. Importar o Link para navegação
+import { Link } from "react-router-dom";
 
 const HeroSection: React.FC = () => {
   return (
@@ -19,9 +22,14 @@ const HeroSection: React.FC = () => {
           <p className="text-xl sm:text-2xl mb-10 max-w-lg">
             Conectamos pessoas a ONGs de adoção de pets, de forma simples, rápida e responsável.
           </p>
-          <button className="w-75 mx-auto block px-10 py-4 text-xl font-bold rounded-full !text-white !bg-amber-800 hover:!bg-amber-900 shadow-xl transition duration-300 transform hover:scale-[1.02]">
+          
+          {/* 2. Alterado de <button> para <Link> */}
+          <Link 
+            to="/search"
+            className="w-75 mx-auto block px-10 py-4 text-xl font-bold rounded-full !text-white !bg-amber-800 hover:!bg-amber-900 shadow-xl transition duration-300 transform hover:scale-[1.02] text-center no-underline"
+          >
             Busque Pets Já!
-          </button>
+          </Link>
         </div>
 
         {/* Ilustração */}

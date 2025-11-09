@@ -65,6 +65,7 @@ services:
       # (Lê do arquivo .env)
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GMAIL_PASSWORD=${GMAIL_PASSWORD}
 
       # --- Configuração do JWT ---
       # (Lê do arquivo .env)
