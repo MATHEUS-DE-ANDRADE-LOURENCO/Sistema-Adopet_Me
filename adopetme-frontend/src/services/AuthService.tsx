@@ -1,15 +1,38 @@
 // adopetme-frontend/src/services/AuthService.tsx
 
-// Use full backend URL to avoid proxy/CORS surprises during local development
-const API_BASE_URL = "http://localhost:8081"; 
+// 1. Atualiza a URL base para incluir /api
+const API_BASE_URL = "http://localhost:8081/api"; 
 
+// 2. Atualiza a interface de resposta para incluir userRole
 export interface LoginResponse {
   token: string;
   message: string;
+  userRole: string; // Adicionado
 }
+
+// 3. Define o tipo para os dados de registro
+// (Este tipo é usado pela RegisterPage e deve ser exportado)
+export type RegisterData = {
+    tipoUsuario: 'TUTOR' | 'ONG';
+    email: string;
+    senha: string;
+    nome?: string;
+    sobrenome?: string;
+    nomeOng?: string;
+    telefone?: string;
+    endereco?: string;
+}
+// 4. Define o tipo de resposta do registro
+export interface RegisterResponse {
+    token: string | null;
+    message: string;
+    userRole: string;
+}
+
 
 export async function login(email: string, senha: string): Promise<LoginResponse> {
   try {
+    // 5. Atualiza o endpoint para /api/auth/login
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
@@ -21,7 +44,7 @@ export async function login(email: string, senha: string): Promise<LoginResponse
 
     if (response.ok) {
       const data: LoginResponse = await response.json();
-      return data;
+      return data; // Retorna { token, message, userRole }
     }
     
     let errorBody;
@@ -40,9 +63,10 @@ export async function login(email: string, senha: string): Promise<LoginResponse
   }
 }
 
-// 3. NOVA FUNÇÃO DE REGISTRO
+// 6. Atualiza a função de registro
 export async function register(formData: RegisterData): Promise<RegisterResponse> {
   try {
+    // 7. Atualiza o endpoint para /api/auth/register
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: "POST",
       headers: {
@@ -76,5 +100,6 @@ export async function register(formData: RegisterData): Promise<RegisterResponse
 
 // Lógica de Google Login
 export function handleGoogleRedirect() {
-    window.location.href = `${API_BASE_URL}/oauth2/authorization/google`;
+    // 8. ATENÇÃO: O endpoint de OAuth NÃO está sob /api
+    window.location.href = `http://localhost:8081/oauth2/authorization/google`;
 }

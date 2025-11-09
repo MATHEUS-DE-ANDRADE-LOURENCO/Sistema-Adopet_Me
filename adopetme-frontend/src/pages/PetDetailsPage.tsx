@@ -1,16 +1,14 @@
+// adopetme-frontend/src/pages/PetDetailsPage.tsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { Pet } from "../models/PetModel";
 import { Heart, Home, PawPrint, Calendar } from "lucide-react";
 import Footer from "../components/Footer";
+import { getPetById } from "../services/PetService"; // 1. Importar o serviço real
 
-// Mock de Dados: Em uma aplicação real, faria uma chamada de API usando o 'id'.
-const MOCK_PETS: Pet[] = [
-    { id: 1, nome: "Rex", tipo: "Cachorro", idade: "2 anos" },
-    { id: 2, nome: "Mia", tipo: "Gato", idade: "1 ano" },
-    { id: 3, nome: "Bolt", tipo: "Cachorro", idade: "3 anos" },
-];
+// 2. Remover o MOCK_PETS
+// const MOCK_PETS: Pet[] = [ ... ];
 
 export default function PetDetailsPage() {
     // Captura o ID do pet da URL (ex: /pets/1)
@@ -18,20 +16,35 @@ export default function PetDetailsPage() {
     
     const [pet, setPet] = useState<Pet | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null); // 3. Adicionar estado de erro
 
     useEffect(() => {
-        setLoading(true);
-        // Simulação de chamada de API: busca o pet pelo ID
-        setTimeout(() => {
-            const petId = parseInt(id || '0');
-            const foundPet = MOCK_PETS.find(p => p.id === petId) || null;
-            
-            setPet(foundPet);
-            setLoading(false);
-        }, 800);
+        const fetchPet = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const petId = parseInt(id || '0');
+                if (isNaN(petId) || petId <= 0) {
+                    throw new Error("ID de pet inválido.");
+                }
+                // 4. Simulação de API substituída pela chamada real
+                const foundPet = await getPetById(petId);
+                setPet(foundPet);
+            } catch (err) {
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError("Erro desconhecido ao buscar o pet.");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPet();
     }, [id]);
 
-    // Trata estados de carregamento e Pet não encontrado
+    // Trata estados de carregamento
     if (loading) {
         return (
             <div className="min-h-screen w-screen flex items-center justify-center bg-[#FFF8F0]">
@@ -40,18 +53,22 @@ export default function PetDetailsPage() {
         );
     }
 
-    if (!pet) {
+    // 5. Tratar erro de API ou Pet não encontrado
+    if (error || !pet) {
         return (
             <div className="min-h-screen w-screen flex flex-col bg-[#FFF8F0]">
                 <Navbar />
                 <main className="flex-1 flex flex-col items-center justify-center p-10">
                     <h1 className="text-4xl font-bold text-[#3b1f0e] mb-4">Pet não encontrado 😢</h1>
-                    <p className="text-lg text-[#7b5a3b]">Verifique o ID ou volte para a página de busca.</p>
+                    <p className="text-lg text-[#7b5a3b]">
+                        {error || "Verifique o ID ou volte para a página de busca."}
+                    </p>
                 </main>
             </div>
         );
     }
 
+    // 6. Usar dados reais da API (pet.especie, pet.idade, pet.sexo, pet.descricao)
     return (
         <div className="min-h-screen w-screen flex flex-col bg-[#FFF8F0] overflow-x-hidden">
             <Navbar />
@@ -65,7 +82,7 @@ export default function PetDetailsPage() {
                         {/* Imagem e Botões */}
                         <div className="md:w-1/3 flex flex-col items-center">
                             <img
-                                src={`https://place-puppy.com/300x300?image=${pet.id}`}
+                                src={`https://place-puppy.com/300x300?image=${pet.id}`} // Placeholder
                                 alt={pet.nome}
                                 className="w-full h-auto max-w-xs rounded-2xl object-cover border-4 border-[#c4742a]/50 shadow-lg mb-6"
                             />
@@ -82,12 +99,12 @@ export default function PetDetailsPage() {
                         {/* Detalhes do Pet */}
                         <div className="md:w-2/3">
                             <h1 className="text-5xl font-extrabold text-[#3b1f0e] mb-2">{pet.nome}</h1>
-                            <p className="text-xl text-[#c4742a] font-semibold mb-6">{pet.tipo}</p>
+                            <p className="text-xl text-[#c4742a] font-semibold mb-6">{pet.especie}</p>
 
                             <div className="grid grid-cols-2 gap-4 text-lg text-[#3b1f0e] mb-8">
                                 <div className="flex items-center">
                                     <Calendar className="mr-2 text-[#c4742a]" size={20} />
-                                    <span>**Idade:** {pet.idade}</span>
+                                    <span>**Idade:** {pet.idade} anos</span>
                                 </div>
                                 <div className="flex items-center">
                                     <Home className="mr-2 text-[#c4742a]" size={20} />
@@ -95,7 +112,7 @@ export default function PetDetailsPage() {
                                 </div>
                                 <div className="flex items-center">
                                     <Heart className="mr-2 text-[#c4742a]" size={20} />
-                                    <span>**Gênero:** Fêmea</span>
+                                    <span>**Gênero:** {pet.sexo}</span>
                                 </div>
                                 <div className="flex items-center">
                                     <PawPrint className="mr-2 text-[#c4742a]" size={20} />
@@ -106,10 +123,7 @@ export default function PetDetailsPage() {
                             {/* Descrição Longa */}
                             <h2 className="text-2xl font-bold text-[#3b1f0e] mb-3">Sobre {pet.nome}</h2>
                             <p className="text-lg leading-relaxed text-[#7b5a3b]">
-                                {pet.nome} é um(a) {pet.tipo.toLowerCase()} extremamente dócil e brincalhão(a). 
-                                Adora longas caminhadas no parque e se dá muito bem com crianças e outros animais. 
-                                Ele(a) está à procura de um lar para chamar de seu. É vacinado(a) e castrado(a). 
-                                Sua energia é contagiante e ele(a) trará muita alegria para sua família!
+                                {pet.descricao}
                             </p>
                         </div>
                     </div>

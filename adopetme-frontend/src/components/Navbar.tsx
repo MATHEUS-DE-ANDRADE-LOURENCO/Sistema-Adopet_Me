@@ -1,27 +1,65 @@
-// adopetme-frontend/src/components/Navbar.tsx (MODIFICADO)
+// adopetme-frontend/src/components/Navbar.tsx
 import React from "react";
-import { PawPrint, User } from "lucide-react";
+import { PawPrint, User, Home, Search, FilePenLine, Info, Users } from "lucide-react"; // Importa ícones
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSession } from "../context/SessionContext";
 
-const navLinks = [
-  { name: "Home", href: "/" },
-  { name: "Buscar Pets", href: "/search" },
-  { name: "Denúncias", href: "/report" },
-  { name: "Sobre nós", href: "/about-us" }
+// 1. Define os links base
+const baseNavLinks = [
+  { name: "Home", href: "/", icon: Home },
+  { name: "Denúncias", href: "/report", icon: FilePenLine },
+  { name: "Sobre nós", href: "/about-us", icon: Info }
 ];
 
+// 2. Define links específicos por role
+const tutorLinks = [
+  { name: "Buscar Pets", href: "/search", icon: Search },
+];
+
+const ongLinks = [
+  { name: "Registrar Pet", href: "/register-pet", icon: PawPrint }, 
+  { name: "Gerenciar ONG", href: "/manage-ong", icon: Users } // Link futuro
+];
+
+
 const Navbar: React.FC = () => {
-  const { session, setSession, userEmail } = useSession();
+  // 3. Pega a userRole do contexto
+  const { session, setSession, userEmail, userRole } = useSession();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setSession('NONE', null, null);
+    setSession('NONE', null, null, null); // Limpa a role no logout
     navigate('/');
   };
+  
+  // 4. Determina quais links mostrar
+  const navLinks = React.useMemo(() => {
+    let specificLinks = [];
+    if (userRole === 'ADMIN_ONG') {
+        specificLinks = ongLinks;
+    } else { 
+        // "Buscar Pets" agora é padrão para tutores E usuários deslogados
+        specificLinks = tutorLinks;
+    }
+    
+    // Insere os links específicos logo após "Home"
+    const links = [
+        { name: "Home", href: "/", icon: Home },
+        ...specificLinks,
+        { name: "Denúncias", href: "/report", icon: FilePenLine },
+        { name: "Sobre nós", href: "/about-us", icon: Info }
+    ];
+    
+    // Remove duplicatas se "Buscar Pets" já foi adicionado
+    if (userRole === 'ADMIN_ONG') {
+        return links.filter(link => link.name !== 'Buscar Pets');
+    }
+    return links;
+
+  }, [userRole]); // Recalcula os links se a userRole mudar
 
   const baseClasses =
-    "no-underline !text-neutral-50 visited:!text-neutral-50 hover:!text-gray-200 focus:!text-neutral-50 active:!text-neutral-50 font-medium transition duration-150 p-2 rounded-lg";
+    "no-underline !text-neutral-50 visited:!text-neutral-50 hover:!text-gray-200 focus:!text-neutral-50 active:!text-neutral-50 font-medium transition duration-150 p-2 rounded-lg flex items-center gap-1.5";
   const activeClasses = "font-bold";
 
   return (
@@ -36,17 +74,24 @@ const Navbar: React.FC = () => {
           </span>
         </Link>
 
-        <div className="hidden sm:flex space-x-8 items-center">
+        {/* 5. Renderiza os links dinâmicos */}
+        <div className="hidden sm:flex space-x-6 items-center">
           {navLinks.map((link) => (
-            <NavLink
-              key={link.name}
-              to={link.href}
-              className={({ isActive }) => `${baseClasses} ${isActive ? activeClasses : ""}`}
-            >
-              {link.name}
-            </NavLink>
+            // ==========================================================
+            // MUDANÇA AQUI:
+            // "Buscar Pets" foi removido da lista de links restritos.
+            // ==========================================================
+            (session === 'LOGGED_IN' || !['Registrar Pet', 'Gerenciar ONG'].includes(link.name)) ? (
+                <NavLink
+                key={link.name}
+                to={link.href}
+                className={({ isActive }) => `${baseClasses} ${isActive ? activeClasses : ""}`}
+                >
+                <link.icon className="w-4 h-4" />
+                {link.name}
+                </NavLink>
+            ) : null
           ))}
-          {/* NOVO: Adiciona link de Denúncia se necessário - mantido simples por enquanto */}
         </div>
 
         <div className="flex space-x-3 items-center">

@@ -1,5 +1,6 @@
 package com.adopetme.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // <-- IMPORTAR
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,17 +16,17 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "USUARIO") // A tabela no DB ainda se chama USUARIO
+@Table(name = "USUARIO")
 @Getter
 @Setter
 @NoArgsConstructor
-public class User implements UserDetails { // Classe Renomeada
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Usando Integer como chave primária
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER) // Correção anterior (Manter)
     @JoinColumn(name = "id_ong")
     private Ong ong;
 
@@ -55,6 +56,10 @@ public class User implements UserDetails { // Classe Renomeada
     @Column(name = "dt_cadastro")
     private OffsetDateTime dtCadastro;
 
+    // ==========================================================
+    // CORREÇÃO PREVENTIVA APLICADA AQUI
+    // ==========================================================
+    @JsonIgnore // Impede que o Jackson serialize esta lista
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorito> favoritos;
 
@@ -64,27 +69,21 @@ public class User implements UserDetails { // Classe Renomeada
             dtCadastro = OffsetDateTime.now();
         }
     }
-
-    // ==========================================================
-    // Implementação dos Métodos do UserDetails
-    // ==========================================================
-
+    
+    // ... (restante da classe UserDetails, getPassword, getUsername, etc.) ...
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Usa o campo 'tipoUsuario' como a ROLE.
-        // O prefixo "ROLE_" é uma convenção do Spring Security.
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + this.tipoUsuario.toUpperCase()));
     }
 
     @Override
     public String getPassword() {
-        // Retorna o campo 'senha'
         return this.senha;
     }
 
     @Override
     public String getUsername() {
-        // Usa o 'email' como o nome de usuário para login.
         return this.email;
     }
 
@@ -108,12 +107,11 @@ public class User implements UserDetails { // Classe Renomeada
         return true;
     }
 
-    // Métodos equals e hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o; // Renomeado
+        User user = (User) o;
         return Objects.equals(id, user.id);
     }
 

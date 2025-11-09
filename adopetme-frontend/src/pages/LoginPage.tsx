@@ -1,4 +1,4 @@
-// adopetme-frontend/src/pages/LoginPage.tsx (MODIFICADO - VERSÃO FINAL DE INTEGRAÇÃO)
+// adopetme-frontend/src/pages/LoginPage.tsx
 
 import React, { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,11 +8,12 @@ import { FcGoogle } from "react-icons/fc";
 import { login } from "../services/AuthService";
 import { useSession } from "../context/SessionContext"; 
 import { Loader2 } from 'lucide-react'; 
-import { FaPaw, FaUsers } from 'react-icons/fa';
+// 1. REMOVER FaPaw, FaUsers
+// import { FaPaw, FaUsers } from 'react-icons/fa';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { setSession } = useSession(); 
+  const { setSession } = useSession(); // Pega o setSession atualizado
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +21,8 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null);
 
-  const [localSelection, setLocalSelection] = useState<'TUTOR' | 'ONG'>('TUTOR');
+  // 2. REMOVER O ESTADO localSelection
+  // const [localSelection, setLocalSelection] = useState<'TUTOR' | 'ONG'>('TUTOR');
   
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -28,9 +30,16 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const { token } = await login(email, password); 
-      setSession('LOGGED_IN', token, email);
-      localStorage.setItem("user_role_mock", localSelection);
+      // A API retorna { token, message, userRole }
+      const { token, userRole } = await login(email, password); 
+      
+      // 3. REMOVER A LÓGICA DE FALLBACK
+      // A role é exatamente o que a API retornou.
+      // const roleToSave = userRole || (localSelection === 'ONG' ? 'ADMIN_ONG' : 'USER');
+      
+      // Salva token, email E role no contexto
+      setSession('LOGGED_IN', token, email, userRole); 
+      
       navigate("/");
     } catch (error) {
       if (error instanceof Error) {
@@ -44,6 +53,7 @@ const LoginPage: React.FC = () => {
   };
 
   const handleGoogleRedirect = () => {
+    // ATENÇÃO: O endpoint de OAuth NÃO está sob /api
     window.location.href = "http://localhost:8081/oauth2/authorization/google";
   }
 
@@ -58,33 +68,8 @@ const LoginPage: React.FC = () => {
         <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
           <h1 className="text-2xl font-bold text-center mb-6 text-black">Bem-Vindo de Volta!</h1>
 
-          {/* Botões de Seleção de Perfil (COM CONTRASTE CORRIGIDO) */}
-          <div className="flex items-center justify-center gap-6 mb-6">
-              <button
-                  type="button"
-                  onClick={() => setLocalSelection('ONG')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-amber-600 transition duration-200 ${
-                    localSelection === 'ONG' 
-                      ? 'bg-white text-amber-600 hover:bg-amber-50' 
-                      : 'bg-amber-600 text-white shadow-md'
-                  }`}
-              >
-                  <FaUsers className="w-5 h-5" />
-                  <span className="font-semibold">ONG</span>
-              </button>
-              <button
-                  type="button"
-                  onClick={() => setLocalSelection('TUTOR')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-amber-600 transition duration-200 ${
-                    localSelection === 'TUTOR' 
-                      ? 'bg-white text-amber-600 hover:bg-amber-50'
-                      : 'bg-amber-600 text-white shadow-md'
-                  }`}
-              >
-                  <FaPaw className="w-5 h-5" />
-                  <span className="font-semibold">Tutor</span>
-              </button>
-          </div>
+          {/* 4. REMOVER OS BOTÕES DE SELEÇÃO DE PERFIL */}
+          {/* <div className="flex items-center justify-center gap-6 mb-6"> ... </div> */}
           
           {error && <div className="text-red-600 mb-4 text-sm text-center bg-red-100 p-2 rounded border border-red-200">{error}</div>}
 
@@ -118,7 +103,7 @@ const LoginPage: React.FC = () => {
               </label>
               <span
                 className="text-yellow-600 hover:underline cursor-pointer"
-                onClick={() => navigate("/recuperar-senha")}
+                onClick={() => navigate("/recuperar-senha")} // Você não forneceu essa página, mas mantive o link
               >
                 Esqueci minha senha
               </span>
@@ -146,7 +131,7 @@ const LoginPage: React.FC = () => {
             Não tem uma conta?{" "}
             <span
               className="text-yellow-600 hover:underline cursor-pointer"
-              onClick={() => navigate("/register")} // Verifique se o caminho é /register ou /registro
+              onClick={() => navigate("/register")}
             >
               Registre-se
             </span>

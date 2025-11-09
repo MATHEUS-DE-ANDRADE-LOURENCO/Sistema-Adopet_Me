@@ -14,27 +14,25 @@ const OAuth2RedirectHandler: React.FC = () => {
     // 1. Extrai o token e o erro da URL
     const token = searchParams.get("token");
     const error = searchParams.get("error");
-    // O email é necessário para o Navbar, mas o backend APENAS envia o token por padrão.
-    // Se você modificar o backend (Passo 3 abaixo), o email virá aqui:
     const email = searchParams.get("email"); 
 
     if (token) {
-      // 2. Salva a sessão no contexto (com o email, se existir)
-      setSession('LOGGED_IN', token, email);
+      // 2. Usuários do Google são sempre "USER" (Tutor) por padrão
+      const role = "USER"; 
       
-      // Assumindo uma role para a lógica de navegação funcionar
-      localStorage.setItem("user_role_mock", "USER"); 
+      // 3. Salva a sessão completa (token, email, role)
+      setSession('LOGGED_IN', token, email, role);
 
-      // 3. Redireciona para a página principal
+      // 4. Redireciona para a página principal
       navigate("/", { replace: true });
 
     } else if (error) {
-      // 4. Em caso de erro, redireciona para a página de login com a mensagem de erro
+      // 5. Em caso de erro, redireciona para a página de login com a mensagem de erro
       console.error("OAuth2 Login Falhou:", error);
       navigate("/login", { state: { error: `Login com Google falhou: ${error}` } });
     
     } else {
-      // 5. Caso inesperado
+      // 6. Caso inesperado
       navigate("/login", { state: { error: "Login com Google falhou devido a um erro desconhecido." } });
     }
   }, [searchParams, navigate, setSession]);
