@@ -1,6 +1,6 @@
 // adopetme-frontend/src/components/Navbar.tsx
 import React from "react";
-import { PawPrint, User, Home, Search, FilePenLine, Info, Users } from "lucide-react"; // Importa ícones
+import { PawPrint, User, Home, Search, FilePenLine, Info, Users, Heart } from "lucide-react"; // Importa ícones
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSession } from "../context/SessionContext";
 
@@ -14,6 +14,7 @@ const baseNavLinks = [
 // 2. Define links específicos por role
 const tutorLinks = [
   { name: "Buscar Pets", href: "/search", icon: Search },
+  { name: "Meus Favoritos", href: "/favoritos", icon: Heart }
 ];
 
 const ongLinks = [

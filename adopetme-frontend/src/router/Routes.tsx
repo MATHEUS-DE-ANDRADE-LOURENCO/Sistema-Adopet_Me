@@ -19,10 +19,11 @@ import ReportPage from '../pages/ReportPage';
 import ManageOngPage from '../pages/ManageOngPage'; 
 // 5. IMPORTAR A NOVA PÁGINA DE EDIÇÃO
 import EditPetPage from '../pages/EditPetPage';
+// 6. IMPORTAR A PÁGINA DE FAVORITOS (AQUI ESTAVA A PARTE QUE FALTAVA)
+import FavoritosPage from '../pages/FavoritosPage';
 
 
 const NotFoundPage = () => <div className="p-10 text-center text-3xl font-bold text-red-600">404 - Página Não Encontrada</div>;
-// const AnimalRegistrationPage = () => ... // Removido
 
 // Esse componente define todas as rotas do aplicativo.
 const AppRoutes: React.FC = () => {
@@ -47,11 +48,13 @@ const AppRoutes: React.FC = () => {
 
       <Route path="/auth/oauth2/redirect" element={<OAuth2RedirectHandler />} />
       
+      {/* 7. ADICIONAR A NOVA ROTA DE FAVORITOS (AQUI ESTAVA A LINHA FALTANTE) */}
+      <Route path="/favoritos" element={<FavoritosPage />} />
+
       {/* Rotas de ONG */}
       <Route path="/register-pet" element={<PetRegistrationPage />} />
       <Route path="/manage-ong" element={<ManageOngPage />} /> 
       
-      {/* 6. ADICIONAR A NOVA ROTA DE EDIÇÃO DE PET */}
       <Route path="/edit-pet/:id" element={<EditPetPage />} />
 
       {/* Rota Curinga para 404 (qualquer caminho não mapeado) */}

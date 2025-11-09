@@ -92,8 +92,13 @@ public class SecurityConfig {
                         
                         // Gerenciamento da ONG (somente /api/ong/me)
                         .requestMatchers("/api/ong/me").hasRole("ADMIN_ONG")
-                        // --- FIM DAS NOVAS REGRAS ---
                         
+                        // ==========================================================
+                        // A REGRA DE FAVORITOS DEVE VIR AQUI
+                        // ==========================================================
+                        .requestMatchers("/api/favoritos/**").hasRole("USER")
+
+                        // .anyRequest().authenticated() DEVE SER A ÚLTIMA REGRA
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
