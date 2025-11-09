@@ -108,3 +108,101 @@ export async function registerPet(petData: PetRegistrationData, token: string): 
     throw error;
   }
 }
+
+// ==========================================================
+// NOVAS FUNÇÕES DE GERENCIAMENTO
+// ==========================================================
+
+/**
+ * Busca todos os pets da ONG logada.
+ */
+export async function getMyOngPets(token: string): Promise<Pet[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/pets/my-ong`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Erro de rede: ${response.status}`);
+    }
+    
+    const data: Pet[] = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error("Falha ao buscar pets da ONG:", error);
+    if (error instanceof TypeError) {
+        throw new Error("Não foi possível conectar ao servidor.");
+    }
+    throw error;
+  }
+}
+
+
+/**
+ * Atualiza um pet existente. (Ainda não vamos usar, mas é bom ter)
+ * Nota: A API espera PetRegistrationData, o mesmo DTO do registro.
+ */
+export async function updatePet(petId: number, petData: PetRegistrationData, token: string): Promise<Pet> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/pets/${petId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(petData),
+    });
+
+    if (response.ok) {
+      const data: Pet = await response.json();
+      return data;
+    }
+    
+    let errorBody;
+    try {
+        errorBody = await response.text(); 
+    } catch {
+        errorBody = `Status ${response.status}`;
+    }
+    throw new Error(errorBody || `Erro de rede: ${response.status}`);
+
+  } catch (error) {
+    if (error instanceof TypeError) {
+        throw new Error("Não foi possível conectar ao servidor.");
+    }
+    throw error;
+  }
+}
+
+
+/**
+ * Deleta um pet.
+ */
+export async function deletePet(petId: number, token: string): Promise<string> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/pets/${petId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const responseText = await response.text(); // Pega a mensagem (ex: "Pet deletado")
+    
+    if (!response.ok) {
+        throw new Error(responseText || "Falha ao deletar pet.");
+    }
+    
+    return responseText; // Retorna a mensagem de sucesso
+
+  } catch (error) {
+    console.error("Falha ao deletar pet:", error);
+    if (error instanceof TypeError) {
+        throw new Error("Não foi possível conectar ao servidor.");
+    }
+    throw error;
+  }
+}

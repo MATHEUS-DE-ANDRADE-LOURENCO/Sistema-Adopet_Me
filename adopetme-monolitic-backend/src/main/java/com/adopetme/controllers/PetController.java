@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional; // 1. IMPORTAR OPTIONAL
+import java.util.stream.Collectors; // <-- ADICIONE ESTE IMPORT
 
 @RestController
 @RequestMapping("/api/pets") // Prefixo /api para clareza
@@ -110,5 +111,136 @@ public class PetController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao registrar pet: " + e.getMessage());
         }
+    }
+    
+    // ==========================================================
+    // NOVOS MÉTODOS DE GERENCIAMENTO DE PETS
+    // ==========================================================
+
+    /**
+     * Endpoint SEGURO para ONGs listarem APENAS OS SEUS pets.
+     */
+    @GetMapping("/my-ong")
+    public ResponseEntity<List<Pet>> getMyOngPets(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            User adminOngUser = findUserByAuth(authentication);
+            Ong ong = adminOngUser.getOng();
+            if (ong == null) {
+                // Se o usuário não é de ONG, retorna lista vazia
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(List.of());
+            }
+
+            // Busca todos os pets e filtra apenas os da ONG do usuário
+            // Em uma aplicação maior, faríamos isso com uma query customizada no repositório
+            List<Pet> ongPets = petRepository.findAll().stream()
+                    .filter(pet -> pet.getOng().getId().equals(ong.getId()))
+                    .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(ongPets);
+
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(List.of());
+        }
+    }
+
+    /**
+     * Endpoint SEGURO para ONGs ATUALIZAREM um pet.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePet(
+            @PathVariable Integer id,
+            @RequestBody PetRegistrationRequest petRequest, // Reutiliza o DTO de registro
+            Authentication authentication) {
+        
+        try {
+            User adminOngUser = findUserByAuth(authentication);
+            // 1. Verifica se o Pet existe E se pertence à ONG do usuário
+            Pet pet = verifyPetOwnership(id, adminOngUser);
+
+            // 2. Atualiza o pet com os novos dados
+            pet.setNome(petRequest.getNome());
+            pet.setEspecie(petRequest.getEspecie());
+            pet.setSexo(petRequest.getSexo());
+            pet.setIdade(petRequest.getIdade());
+            pet.setDescricao(petRequest.getDescricao());
+            pet.setStatus(petRequest.getStatus());
+            pet.setNinhada(petRequest.getNinhada());
+            pet.setCastracao(petRequest.getCastracao());
+            pet.setDtNascimento(petRequest.getDtNascimento());
+            // dtCadastro e ong não mudam
+
+            Pet savedPet = petRepository.save(pet);
+            return ResponseEntity.ok(savedPet);
+
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (IllegalAccessException e) {
+            // Se o pet não pertencer à ONG
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (RuntimeException e) {
+            // Se o pet não for encontrado (do verifyPetOwnership)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Endpoint SEGURO para ONGs DELETAREM um pet.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePet(@PathVariable Integer id, Authentication authentication) {
+        try {
+            User adminOngUser = findUserByAuth(authentication);
+            // 1. Verifica se o Pet existe E se pertence à ONG do usuário
+            Pet pet = verifyPetOwnership(id, adminOngUser);
+
+            // 2. Deleta o pet
+            petRepository.delete(pet);
+            return ResponseEntity.ok().body("Pet " + pet.getNome() + " deletado com sucesso.");
+
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (IllegalAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
+    // ==========================================================
+    // MÉTODOS AUXILIARES (REPETIDOS DO OngController)
+    // ==========================================================
+
+    private User findUserByAuth(Authentication authentication) {
+        String userEmail = authentication.getName();
+        return userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+    }
+    
+    /**
+     * Verifica se o pet (pelo id) pertence à ONG do usuário logado.
+     * @return O objeto Pet se a posse for verificada.
+     * @throws RuntimeException Se o pet não for encontrado.
+     * @throws IllegalAccessException Se o pet não pertencer à ONG do usuário.
+     */
+    private Pet verifyPetOwnership(Integer petId, User adminOngUser) throws IllegalAccessException {
+        Ong ong = adminOngUser.getOng();
+        if (ong == null) {
+            throw new IllegalAccessException("Este usuário não está associado a uma ONG.");
+        }
+
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new RuntimeException("Pet não encontrado com ID: " + petId));
+
+        // Ponto crucial de segurança:
+        if (!pet.getOng().getId().equals(ong.getId())) {
+            throw new IllegalAccessException("Acesso negado. Este pet não pertence à sua ONG.");
+        }
+        
+        return pet;
     }
 }

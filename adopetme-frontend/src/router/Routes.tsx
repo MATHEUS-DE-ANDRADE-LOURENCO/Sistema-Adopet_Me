@@ -13,6 +13,12 @@ import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler';
 import RegisterPage from '../pages/RegisterPage'; 
 // 2. Importar a página de registro de pet
 import PetRegistrationPage from '../pages/PetRegistrationPage';
+// 3. Importar a página de denúncia
+import ReportPage from '../pages/ReportPage';
+// 4. Importar a página de gerenciamento
+import ManageOngPage from '../pages/ManageOngPage'; 
+// 5. IMPORTAR A NOVA PÁGINA DE EDIÇÃO
+import EditPetPage from '../pages/EditPetPage';
 
 
 const NotFoundPage = () => <div className="p-10 text-center text-3xl font-bold text-red-600">404 - Página Não Encontrada</div>;
@@ -30,20 +36,23 @@ const AppRoutes: React.FC = () => {
       <Route path="/search-results" element={<SearchResultsPage />} />
       <Route path="/about-us" element={<AboutUsPage />} />
       <Route path="/pets/:id" element={<PetDetailsPage />} />
-      <Route path="/report" element={<NotFoundPage />} />
+      
+      {/* Rota de Denúncia */}
+      <Route path="/report" element={<ReportPage />} />
       
       {/* Rotas de Autenticação */}
       <Route path="/login" element={<LoginPage />} />
       
-      {/* 3. A rota agora usa o componente importado */}
       <Route path="/register" element={<RegisterPage />} />
 
       <Route path="/auth/oauth2/redirect" element={<OAuth2RedirectHandler />} />
       
-      {/* 4. Adicionar a nova rota para ONGs */}
+      {/* Rotas de ONG */}
       <Route path="/register-pet" element={<PetRegistrationPage />} />
-      {/* Rota futura (exemplo da Navbar) */}
-      <Route path="/manage-ong" element={<NotFoundPage />} /> 
+      <Route path="/manage-ong" element={<ManageOngPage />} /> 
+      
+      {/* 6. ADICIONAR A NOVA ROTA DE EDIÇÃO DE PET */}
+      <Route path="/edit-pet/:id" element={<EditPetPage />} />
 
       {/* Rota Curinga para 404 (qualquer caminho não mapeado) */}
       <Route path="*" element={<NotFoundPage />} />

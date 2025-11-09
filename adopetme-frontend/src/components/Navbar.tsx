@@ -17,6 +17,7 @@ const tutorLinks = [
 ];
 
 const ongLinks = [
+  { name: "Buscar Pets", href: "/search", icon: Search },
   { name: "Registrar Pet", href: "/register-pet", icon: PawPrint }, 
   { name: "Gerenciar ONG", href: "/manage-ong", icon: Users } // Link futuro
 ];
@@ -77,10 +78,6 @@ const Navbar: React.FC = () => {
         {/* 5. Renderiza os links dinâmicos */}
         <div className="hidden sm:flex space-x-6 items-center">
           {navLinks.map((link) => (
-            // ==========================================================
-            // MUDANÇA AQUI:
-            // "Buscar Pets" foi removido da lista de links restritos.
-            // ==========================================================
             (session === 'LOGGED_IN' || !['Registrar Pet', 'Gerenciar ONG'].includes(link.name)) ? (
                 <NavLink
                 key={link.name}
@@ -95,7 +92,6 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="flex space-x-3 items-center">
-          {/* 👈 Lógica de exibição baseada na sessão */}
           {session === 'NONE' ? (
             <>
               <Link
