@@ -3,12 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { Pet } from "../models/PetModel";
-import { Heart, Home, PawPrint, Calendar } from "lucide-react";
+import { Heart, Home, PawPrint, Calendar, ImageOff } from "lucide-react"; // Importar ImageOff
 import Footer from "../components/Footer";
-import { getPetById } from "../services/PetService"; // 1. Importar o serviço real
+import { getPetById } from "../services/PetService"; 
 
-// 2. Remover o MOCK_PETS
-// const MOCK_PETS: Pet[] = [ ... ];
+const API_HOST = "http://localhost:8081"; // URL do Backend (para montar a URL da imagem)
 
 export default function PetDetailsPage() {
     // Captura o ID do pet da URL (ex: /pets/1)
@@ -16,7 +15,7 @@ export default function PetDetailsPage() {
     
     const [pet, setPet] = useState<Pet | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null); // 3. Adicionar estado de erro
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPet = async () => {
@@ -27,7 +26,7 @@ export default function PetDetailsPage() {
                 if (isNaN(petId) || petId <= 0) {
                     throw new Error("ID de pet inválido.");
                 }
-                // 4. Simulação de API substituída pela chamada real
+                // Chamada de API real
                 const foundPet = await getPetById(petId);
                 setPet(foundPet);
             } catch (err) {
@@ -53,7 +52,7 @@ export default function PetDetailsPage() {
         );
     }
 
-    // 5. Tratar erro de API ou Pet não encontrado
+    // Tratar erro de API ou Pet não encontrado
     if (error || !pet) {
         return (
             <div className="min-h-screen w-screen flex flex-col bg-[#FFF8F0]">
@@ -68,7 +67,12 @@ export default function PetDetailsPage() {
         );
     }
 
-    // 6. Usar dados reais da API (pet.especie, pet.idade, pet.sexo, pet.descricao)
+    // Define a URL da imagem
+    // O backend nos envia pet.fotoUrl (ex: /uploads/uuid.png)
+    const imageUrl = pet.fotoUrl 
+        ? `${API_HOST}${pet.fotoUrl}` // ex: http://localhost:8081/uploads/uuid.png
+        : null; // Se não tiver foto
+
     return (
         <div className="min-h-screen w-screen flex flex-col bg-[#FFF8F0] overflow-x-hidden">
             <Navbar />
@@ -81,11 +85,21 @@ export default function PetDetailsPage() {
                         
                         {/* Imagem e Botões */}
                         <div className="md:w-1/3 flex flex-col items-center">
-                            <img
-                                src={`https://place-puppy.com/300x300?image=${pet.id}`} // Placeholder
-                                alt={pet.nome}
-                                className="w-full h-auto max-w-xs rounded-2xl object-cover border-4 border-[#c4742a]/50 shadow-lg mb-6"
-                            />
+                            
+                            {/* Lógica de exibição da imagem */}
+                            {imageUrl ? (
+                                <img
+                                    src={imageUrl}
+                                    alt={pet.nome}
+                                    className="w-full h-auto max-w-xs rounded-2xl object-cover border-4 border-[#c4742a]/50 shadow-lg mb-6"
+                                />
+                            ) : (
+                                // Placeholder se não houver foto
+                                <div className="w-full h-auto max-w-xs aspect-square bg-gray-100 rounded-2xl border-4 border-[#c4742a]/50 shadow-lg mb-6 flex flex-col items-center justify-center text-gray-400">
+                                    <ImageOff size={64} />
+                                    <span className="mt-2 text-sm">Foto não disponível</span>
+                                </div>
+                            )}
 
                             <button className="w-full max-w-xs px-8 py-3 bg-[#c4742a] hover:bg-[#a75e22] text-neutral-50 font-bold rounded-full transition-all duration-200 flex items-center justify-center mb-4">
                                 <Heart className="mr-2" size={20} /> Adotar {pet.nome}

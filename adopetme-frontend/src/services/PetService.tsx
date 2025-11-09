@@ -177,6 +177,42 @@ export async function updatePet(petId: number, petData: PetRegistrationData, tok
   }
 }
 
+// ==========================================================
+// FUNÇÃO DE UPLOAD DE FOTO
+// ==========================================================
+/**
+ * Faz upload da foto principal de um pet.
+ */
+export async function uploadPetPhoto(petId: number, file: File, token: string): Promise<{ fotoUrl: string }> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file); // O backend espera um campo "file"
+
+    const response = await fetch(`${API_BASE_URL}/pets/${petId}/upload-photo`, {
+      method: "POST",
+      headers: {
+        // NÃO definimos "Content-Type". O navegador faz isso
+        // automaticamente para multipart/form-data.
+        "Authorization": `Bearer ${token}`
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Falha ao enviar foto.");
+    }
+    
+    return await response.json(); // Retorna { fotoUrl: "/uploads/..." }
+
+  } catch (error) {
+    console.error("Falha ao fazer upload da foto:", error);
+    if (error instanceof TypeError) {
+        throw new Error("Não foi possível conectar ao servidor.");
+    }
+    throw error;
+  }
+}
 
 /**
  * Deleta um pet.

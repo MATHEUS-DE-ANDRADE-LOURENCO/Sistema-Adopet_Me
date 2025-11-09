@@ -9,5 +9,6 @@ export type Pet = {
     status: string;
     ninhada?: string;
     castracao: boolean;
-    dtNascimento?: string; // Vem como "YYYY-MM-DD"
+    dtNascimento?: string;
+    fotoUrl?: string; 
 };
