@@ -240,7 +240,7 @@ public class PetController {
     /**
      * Busca a foto principal de um pet e a define no campo 'fotoUrl'
      */
-    private void setPrincipalFotoUrl(Pet pet) {
+    public void setPrincipalFotoUrl(Pet pet) { // <-- MUDANÇA DE 'private' PARA 'public'
         // Tenta encontrar uma foto marcada como "principal"
         // Esta é a linha que estava dando o erro de compilação
         Optional<PetFoto> fotoOpt = petFotoRepository.findFirstByPetAndFtPrincipal(pet, true);

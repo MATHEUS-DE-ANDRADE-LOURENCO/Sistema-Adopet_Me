@@ -1,21 +1,29 @@
 // adopetme-frontend/src/pages/PetDetailsPage.tsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // 1. IMPORTAR useNavigate
 import Navbar from "../components/Navbar";
 import { Pet } from "../models/PetModel";
-import { Heart, Home, PawPrint, Calendar, ImageOff } from "lucide-react"; // Importar ImageOff
+import { Heart, Home, PawPrint, Calendar, ImageOff, Loader2 } from "lucide-react"; // 2. IMPORTAR Loader2
 import Footer from "../components/Footer";
 import { getPetById } from "../services/PetService"; 
+import { useSession } from "../context/SessionContext"; // 3. IMPORTAR useSession
+import * as FavoritoService from "../services/FavoritoService"; // 4. IMPORTAR O SERVIÇO DE FAVORITOS
 
 const API_HOST = "http://localhost:8081"; // URL do Backend (para montar a URL da imagem)
 
 export default function PetDetailsPage() {
     // Captura o ID do pet da URL (ex: /pets/1)
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate(); // 5. Instanciar navigate
+    const { token, userRole } = useSession(); // 6. Pegar dados da sessão
     
     const [pet, setPet] = useState<Pet | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // 7. Novos estados para o botão de favorito
+    const [isFavorited, setIsFavorited] = useState(false);
+    const [favLoading, setFavLoading] = useState(false); // Loading só do botão
 
     useEffect(() => {
         const fetchPet = async () => {
@@ -29,6 +37,13 @@ export default function PetDetailsPage() {
                 // Chamada de API real
                 const foundPet = await getPetById(petId);
                 setPet(foundPet);
+
+                // 8. Se estiver logado como USER, checar se já é favorito
+                if (token && userRole === 'USER') {
+                    const favStatus = await FavoritoService.checkFavorito(petId, token);
+                    setIsFavorited(favStatus.isFavorited);
+                }
+
             } catch (err) {
                 if (err instanceof Error) {
                     setError(err.message);
@@ -41,7 +56,34 @@ export default function PetDetailsPage() {
         };
 
         fetchPet();
-    }, [id]);
+    }, [id, token, userRole]); // 9. Adicionar dependências
+
+    // 10. Função para o clique do botão de favoritar
+    const handleToggleFavorito = async () => {
+        if (!token) {
+            navigate('/login'); // Se não está logado, manda pro login
+            return;
+        }
+        if (favLoading || !pet) return;
+
+        setFavLoading(true);
+        try {
+            if (isFavorited) {
+                // Se já é favorito, remove
+                await FavoritoService.removeFavorito(pet.id, token);
+                setIsFavorited(false);
+            } else {
+                // Se não é, adiciona
+                await FavoritoService.addFavorito(pet.id, token);
+                setIsFavorited(true);
+            }
+        } catch (err) {
+            // (Opcional) Mostrar um erro de favoritar
+            console.error("Erro ao favoritar:", err);
+        } finally {
+            setFavLoading(false);
+        }
+    };
 
     // Trata estados de carregamento
     if (loading) {
@@ -73,6 +115,12 @@ export default function PetDetailsPage() {
         ? `${API_HOST}${pet.fotoUrl}` // ex: http://localhost:8081/uploads/uuid.png
         : null; // Se não tiver foto
 
+    // 11. Define estilos dinâmicos para o botão
+    const favoritoButtonStyle = isFavorited
+        ? "border-[#c4742a] bg-[#c4742a] text-white" // Estilo "Favoritado"
+        : "border-[#3b1f0e] text-[#3b1f0e] hover:bg-[#3b1f0e] hover:text-white"; // Estilo "Não favoritado"
+
+
     return (
         <div className="min-h-screen w-screen flex flex-col bg-[#FFF8F0] overflow-x-hidden">
             <Navbar />
@@ -101,13 +149,21 @@ export default function PetDetailsPage() {
                                 </div>
                             )}
 
-                            <button className="w-full max-w-xs px-8 py-3 bg-[#c4742a] hover:bg-[#a75e22] text-neutral-50 font-bold rounded-full transition-all duration-200 flex items-center justify-center mb-4">
-                                <Heart className="mr-2" size={20} /> Adotar {pet.nome}
-                            </button>
-                            
-                            <button className="w-full max-w-xs px-8 py-3 border border-[#3b1f0e] text-neutral-50 font-bold rounded-full transition-all duration-200 flex items-center justify-center hover:bg-[#3b1f0e] hover:text-white">
-                                <PawPrint className="mr-2" size={20} /> Favoritar
-                            </button>
+                            {/* 12. SÓ MOSTRA O BOTÃO SE FOR USER (ou deslogado) */}
+                            {userRole !== 'ADMIN_ONG' && (
+                                <button 
+                                    onClick={handleToggleFavorito}
+                                    disabled={favLoading}
+                                    className={`w-full max-w-xs px-8 py-3 border font-bold rounded-full transition-all duration-200 flex items-center justify-center ${favoritoButtonStyle}`}
+                                >
+                                    {favLoading ? (
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    ) : (
+                                        <PawPrint className="mr-2" size={20} />
+                                    )}
+                                    {isFavorited ? "Favoritado!" : "Favoritar"}
+                                </button>
+                            )}
                         </div>
 
                         {/* Detalhes do Pet */}
