@@ -1,2 +1,3 @@
 Não gravando - Teste 1 do Jenkins
 Gravando - Rodando o Jenkins com os novos testes
+Gravando - Rodando o Jenkins com os novos testes (não conseguimos rodar todos)
