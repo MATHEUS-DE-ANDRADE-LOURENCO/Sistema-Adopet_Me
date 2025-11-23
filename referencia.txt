@@ -1,0 +1,81 @@
+Tarefa03 – IHC
+
+Nome dos Integrantes:
+Matheus de Andrade Lourenço - 10419691
+Murillo Cardoso Ferreira - 10418082
+Pietro Zanaga Neto - 10418574
+
+Nome do Produto:
+Adopet.me
+
+Escopo do Projeto:
+O projeto tem como objetivo desenvolver uma plataforma digital centralizada para facilitar e formalizar o processo de adoção de animais, além de trazer mais visibilidade às ONGs e incentivar o ato. Atualmente, o cenário é marcado pela falta de centralização e visibilidade das instituições de acolhimento, o que contribui para a superlotação dos abrigos, dificulta a conexão entre adotantes e ONGs e compromete a segurança e o bem-estar animal.
+
+A plataforma atuará como uma vitrine digital, permitindo que usuários filtrem os animais disponíveis por localização, características e preferências. Além disso, oferecerá suporte administrativo às ONGs, padronizando e tornando mais transparente o processo de adoção.
+
+Como diferencial, será incluído um canal de denúncias para reportar casos de abandono ou maus-tratos, fortalecendo a proteção animal e auxiliando as ONGs na coleta de animais em necessidade.
+
+Público-Alvo:
+- Pessoas interessadas em adotar animais de estimação.
+- ONGs e abrigos responsáveis pelo resgate, acolhimento e disponibilização de animais.
+- Voluntários que auxiliam em processos de resgate e adoção.
+- Órgãos públicos e instituições parceiras que atuam na fiscalização de maus-tratos.
+
+Objetivo do Produto:
+- Garantir maior visibilidade para animais disponíveis e para as ONGs.
+- Tornar o processo de adoção mais seguro, transparente e acessível.
+- Incentivar a adoção responsável e reduzir a superlotação dos abrigos.
+- Disponibilizar um canal de denúncias para abandono e maus-tratos, auxiliando na fiscalização e coleta de animais.
+- Apoiar a gestão administrativa das ONGs, facilitando cadastros e acompanhamento de adoções.
+
+Requisitos Funcionais:
+1. Cadastro e autenticação de usuários e ONGs.
+2. Cadastro e atualização de animais disponíveis para adoção.
+3. Busca de animais com filtros de espécie, idade, porte, localização e outras características.
+4. Área administrativa para ONGs acompanharem processos de adoção.
+5. Canal de denúncias, permitindo envio de descrição, fotos, vídeos e localização.
+6. Notificações para acompanhamento de status de adoções ou denúncias.
+
+Requisitos Não Funcionais:
+1. Usabilidade: interface intuitiva e fácil de navegar.
+2. Usabilidade: permitir que o usuário demonstre interesse por um animal em até 3 cliques.
+3. Segurança: proteção dos dados dos usuários e das ONGs.
+4. Disponibilidade: sistema acessível 24/7.
+5. Escalabilidade: deve suportar aumento de usuários e ONGs cadastradas.
+6. Performance: carregamento rápido das páginas e buscas otimizadas.
+7. Performance: deve suportar cerca de 10 mil usuários simultaneamente.
+
+Interações dos Usuários:
+
+1. Usuário Adotante – Pesquisa e Adoção
+1. Ele seleciona a opção “Buscar Animais”.
+2. O sistema exibe filtros (espécie, idade, porte, localização etc.).
+3. O usuário aplica os filtros desejados e confirma a busca.
+4. O sistema retorna uma lista de animais disponíveis de acordo com os critérios.
+5. O usuário seleciona um animal e acessa seu perfil detalhado (fotos, histórico de saúde, ONG responsável).
+6. O usuário clica em “Estou Interessado”.
+7. O sistema envia uma mensagem à ONG e confirma ao usuário o recebimento.
+
+2. ONG/Abrigo – Cadastro de Animais
+1. A ONG faz login na área administrativa.
+2. Seleciona a opção “Cadastrar Novo Animal”.
+3. O sistema apresenta formulário com campos obrigatórios (nome, espécie, idade, porte, histórico de saúde, fotos).
+4. A ONG preenche e envia o formulário.
+5. O sistema valida os dados e confirma o cadastro.
+6. O animal passa a aparecer na vitrine digital.
+
+3. Usuário Denunciante – Registro de Maus-Tratos ou Abandono
+1. O usuário acessa a seção “Denunciar” (logado ou anônimo).
+2. O sistema apresenta formulário com descrição, envio de fotos, vídeos e localização.
+3. O usuário preenche e envia.
+4. O sistema registra a denúncia e gera protocolo.
+5. O sistema encaminha a denúncia para a ONG mais próxima ou órgãos parceiros.
+6. O usuário recebe confirmação (se não for anônimo, pode acompanhar o status).
+
+4. Administrador da Plataforma – Gerenciamento de ONGs e Denúncias
+1. O administrador acessa o painel de controle.
+2. O sistema mostra ONGs cadastradas, denúncias e usuários ativos.
+3. O administrador seleciona “Denúncias”.
+4. O sistema exibe lista com status e evidências.
+5. O administrador valida e classifica: válida, em análise ou arquivada.
+6. O sistema atualiza o status e notifica o denunciante (se não for anônimo).

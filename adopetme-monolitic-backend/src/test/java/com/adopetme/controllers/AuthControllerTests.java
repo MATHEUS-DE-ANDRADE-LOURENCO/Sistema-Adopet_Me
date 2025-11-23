@@ -5,6 +5,7 @@ import com.adopetme.models.User;
 import com.adopetme.repositories.OngRepository;
 import com.adopetme.repositories.UserRepository;
 import com.adopetme.security.JwtTokenProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,8 +35,16 @@ public class AuthControllerTests {
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
 
-    @InjectMocks
     private AuthController authController;
+
+    @BeforeEach
+    void setup() {
+        // cria a instância passando o passwordEncoder mock e injeta os demais mocks manualmente
+        authController = new AuthController(passwordEncoder);
+        org.springframework.test.util.ReflectionTestUtils.setField(authController, "userRepository", userRepository);
+        org.springframework.test.util.ReflectionTestUtils.setField(authController, "ongRepository", ongRepository);
+        org.springframework.test.util.ReflectionTestUtils.setField(authController, "jwtTokenProvider", jwtTokenProvider);
+    }
 
     @Test
     void deveRetornar404QuandoUsuarioNaoExistir() {
