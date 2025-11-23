@@ -1,106 +1,134 @@
 **Nome do Projeto**
 
-Adopet.me
+# 🐾 Adopet.me
 
-**Integrantes do Grupo**
+## 👥 Nome do Projeto
 
-- **Matheus de Andrade Lourenço**: 10419691
-- **Murillo Cardoso Ferreira**: 10418082
-- **Pietro Zanaga Neto**: 10418574
+**Adopet.me**
 
-**Detalhes do Projeto**
+---
 
-- **Contexto de Negócio**: O projeto Adopet.me é uma plataforma digital para centralizar, formalizar e facilitar o processo de adoção de animais. Hoje faltam canais centralizados que deem visibilidade às ONGs e abrigos, resultando em superlotação e dificuldade na conexão entre adotantes e instituições. A proposta é oferecer uma "vitrine" digital que permita buscas por localização e características do animal, suporte administrativo para ONGs e um canal de denúncias para abandono/maus-tratos.
-- **Público-alvo**: pessoas interessadas em adoção, ONGs/abrigo, voluntários e órgãos parceiros.
-- **Objetivos**:
-  - Aumentar visibilidade de animais e ONGs.
-  - Tornar adoções mais seguras, transparentes e acessíveis.
-  - Reduzir superlotação dos abrigos.
-  - Criar canal de denúncias com protocolo e acompanhamento.
+## 👨‍👩‍👧‍👦 Integrantes do Grupo
 
-**Requisitos Principais (resumo)**
-- Cadastro e autenticação de usuários e ONGs.
-- Cadastro/atualização de animais com fotos e histórico.
-- Busca por filtros (espécie, idade, porte, localização).
-- Área administrativa para ONGs.
-- Canal de denúncias (descrição, fotos, vídeos, localização).
-- Notificações e acompanhamento de status.
+- Danilo Yui Honda
+- Luis Felipe Basacchi Darre
+- Matheus de Andrade Lourenço
+- Murillo Cardoso Ferreira
+- Pietro Zanaga Neto
 
-**Documentação**
+---
 
-**Arquitetura Geral**
-- **Monorepo dividido em dois módulos principais**: frontend (`adopetme-frontend`) e backend (`adopetme-monolitic-backend`). A integração ocorre via APIs REST/JSON.
-- **Camadas**: UI (React + Vite), API (Spring Boot), Persistência (PostgreSQL em produção, H2 em testes), Infra (Docker + docker-compose) e CI (Jenkins).
+## 📄 Detalhes do Projeto
 
-**Frontend**
+### 🐶 Contexto de Negócio
+
+O Adopet.me é uma plataforma digital que centraliza e formaliza o processo de adoção de animais. O objetivo é aumentar a visibilidade das ONGs, reduzir a superlotação dos abrigos e facilitar a conexão entre adotantes e instituições, além de oferecer um canal de denúncias para abandono e maus-tratos.
+
+### 🎯 Público-alvo
+
+- Pessoas interessadas em adotar animais
+- ONGs e abrigos
+- Voluntários
+- Órgãos públicos e parceiros
+
+### 📝 Objetivos Principais
+
+- Aumentar visibilidade de animais e ONGs
+- Tornar o processo de adoção mais seguro e transparente
+- Reduzir superlotação de abrigos
+- Fornecer canal de denúncias com protocolo e acompanhamento
+
+---
+
+## 🧭 Requisitos (Resumo)
+
+- ✅ Cadastro e autenticação de usuários e ONGs
+- ✅ Cadastro e gerenciamento de animais (fotos, histórico)
+- ✅ Busca com filtros (espécie, idade, porte, localização)
+- ✅ Área administrativa para ONGs
+- ✅ Canal de denúncias (descrição, fotos, vídeos, localização)
+- ✅ Notificações para acompanhamento
+
+---
+
+## 🏗️ Documentação Técnica
+
+### 🏛 Arquitetura Geral
+
+- Monorepo com dois módulos principais:
+  - `adopetme-frontend` (UI)
+  - `adopetme-monolitic-backend` (API)
+- Comunicação via REST/JSON
+- Camadas: UI → API → Persistência → Infraestrutura
+
+### 🖥️ Frontend
+
 - Local: `adopetme-frontend`
-- **Tecnologias**: React + TypeScript + Vite.
-- **Responsabilidades**: experiência do usuário, rotas públicas/privadas, consumo das APIs do backend, upload de imagens, gerenciamento de sessões (OAuth2 / JWT quando aplicável).
+- Tech stack: React + TypeScript + Vite
+- Responsabilidades: UI/UX, rotas, consumo das APIs, upload de imagens, sessões
 
-**Backend**
+### ⚙️ Backend
+
 - Local: `adopetme-monolitic-backend`
-- **Tecnologias**: Java 17, Spring Boot, Spring Data JPA, Flyway (migrations), JWT (autenticação), JUnit 5 + Mockito (testes).
-- **Responsabilidades**: expondo endpoints REST para autenticação, gerenciamento de usuários/ONGs/animais, processamento de denúncias, regras de negócio e integração com banco e serviços externos.
+- Tech stack: Java 17, Spring Boot, Spring Data JPA, Flyway, JWT
+- Responsabilidades: autenticação, CRUD de usuários/ONGs/animais, denúncias, lógica de negócio, persistência
 
-**Banco de Dados**
-- **Produção**: PostgreSQL (migrations em `src/main/resources/db/migration` via Flyway).
-- **Testes/Local**: H2 em memória (recomendado para testes automatizados e CI). Nos testes configure o profile `test` ou use propriedades de ambiente para apontar para `jdbc:h2:mem:testdb` e desabilitar Flyway.
+### 🗄️ Banco de Dados
 
-**Docker**
-- Arquivos: `docker-compose.yml` e `docker-compose.dev.yml` na raiz.
-- Função: orquestra frontend, backend e banco para execução local ou em ambientes de teste. Use `docker-compose up --build` para subir o ambiente completo.
+- Produção: PostgreSQL (migrations em `src/main/resources/db/migration` via Flyway)
+- Testes/Local: H2 (in-memory) — recomendado para CI
 
-**Jenkins / CI**
-- Estratégia recomendada:
-  - Job que executa: `checkout`, `mvn -B -DskipTests=false test`, `npm ci && npm run build` (frontend), `mvn -B -Djacoco:report` (opcional cobertura).
-  - Para evitar dependência de PostgreSQL no CI, adicionar um profile `test` que usa H2 e desabilita Flyway, ou passar propriedades JVM durante o `mvn test`:
+### 🐳 Docker
 
-```
-mvn -B -Dspring.profiles.active=test -Dspring.flyway.enabled=false test
-```
+- Arquivos: `docker-compose.yml`, `docker-compose.dev.yml`
+- Objetivo: orquestrar frontend, backend e banco em ambiente local ou de demonstração
 
-**Testes**
-- Frameworks: JUnit 5, Mockito, Spring Boot Test para testes que precisam do contexto.
-- Boas práticas: preferir testes unitários sem `@SpringBootTest` quando possível; para testes que iniciam contexto usar `application-test.properties` com H2.
+### 🧪 Testes & CI
 
-**Manual de Instalação**
+- Testes: JUnit 5, Mockito, Spring Boot Test (quando necessário)
+- Boas práticas: unit tests sem `@SpringBootTest` sempre que possível; para testes que carregam contexto, criar `application-test.properties` com H2
+- CI (Jenkins): usar profile `test` no `mvn test` para evitar dependência de PostgreSQL, ou executar um container PostgreSQL nos pipelines
 
-Requisitos gerais:
+---
+
+## 🛠️ Manual de Instalação
+
+### 🔎 Requisitos gerais
+
 - Java 17 (OpenJDK 17)
 - Maven 3.6+
-- Node.js 16+ & npm/Yarn
-- Docker & docker-compose (opcional para ambiente conteinerizado)
+- Node.js 16+ (npm ou Yarn)
+- Docker & docker-compose (opcional)
 
-Linux / WSL (Debian/Ubuntu)
+### 🐧 Linux / WSL (Debian / Ubuntu)
 
-```
+```bash
 # instalar Java 17
 sudo apt update && sudo apt install -y openjdk-17-jdk
 
 # instalar Maven
 sudo apt install -y maven
 
-# instalar Node.js (exemplo via NodeSource)
+# instalar Node.js (exemplo NodeSource)
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # instalar Docker
 sudo apt-get install -y docker.io docker-compose
 
-# rodar frontend (modo local)
+# rodar frontend (modo dev)
 cd adopetme-frontend
 npm ci
 npm run dev
 
-# rodar backend (modo local)
+# rodar backend (modo dev)
 cd ../adopetme-monolitic-backend
-# usar mvnw se disponível: ./mvnw spring-boot:run
-mvn spring-boot:run
+./mvnw spring-boot:run   # ou: mvn spring-boot:run
 ```
 
-macOS (Homebrew)
+### 🍎 macOS (Homebrew)
 
-```
+```bash
 brew install openjdk@17 maven node docker
 export JAVA_HOME=$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home
 
@@ -114,56 +142,79 @@ cd ../adopetme-monolitic-backend
 mvn spring-boot:run
 ```
 
-Windows (PowerShell / WSL recomendado)
-- Recomendado usar WSL2 (Ubuntu) para evitar incompatibilidades com ferramentas Unix.
-- Alternativamente instalar Java 17, Maven e Node via pacotes oficiais e executar comandos análogos aos acima.
+### 🪟 Windows
 
-**Executando com Docker (recomendado para demo/local)**
+- Recomenda-se usar WSL2 (Ubuntu) para compatibilidade de ferramentas. Seguir passos semelhantes aos do Linux.
 
-```
-# na raiz do repo
+---
+
+## 🚀 Executando com Docker (Demo / Local)
+
+```bash
+# na raiz do repositório
 docker-compose -f docker-compose.dev.yml up --build
 ```
 
-Isso criará os serviços (frontend, backend, DB) configurados no `docker-compose.dev.yml`.
+Isso levanta frontend, backend e banco conforme configurado.
 
-**Executando Testes Localmente**
-- Preferir o profile de teste (H2). Exemplo:
+---
 
-```
-# com wrapper (se permissões corretas)
+## ✅ Executando Testes Localmente
+
+Preferir o profile `test` com H2 para evitar dependência de PostgreSQL:
+
+```bash
+# com wrapper
 ./mvnw -Dspring.profiles.active=test -Dspring.flyway.enabled=false test
 
-# ou usando mvn e definindo JAVA_HOME explicitamente
+# ou usando mvn com JAVA_HOME
 JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 mvn -Dspring.profiles.active=test -Dspring.flyway.enabled=false test
 ```
 
-Nota: em alguns ambientes a pasta `~/.m2` pode exigir permissões; para CI/containers é comum usar um repositório local dentro do workspace:
+Sugestão para ambientes com problemas de permissão em `~/.m2`:
 
-```
+```bash
 mvn -Dmaven.repo.local=$PWD/.m2/repository test
 ```
 
-**Manual de Utilização (fluxos principais)**
+---
 
-- Usuário buscador:
-  - Entrar em `Buscar Animais` → aplicar filtros → visualizar perfil do animal → clicar `Estou Interessado` para notificar a ONG.
+## 🧭 Manual de Utilização (Fluxos Principais)
 
-- ONG / Abrigo:
-  - Login na área administrativa → `Cadastrar Novo Animal` → preencher formulário (fotos e histórico) → confirmar.
+### 🐾 Usuário (Adotante)
 
-- Canal de denúncias:
-  - Acessar `Denunciar` (logado ou anônimo) → submeter descrição/evidências → receber protocolo e acompanhamento.
+1. Acessar **Buscar Animais**
+2. Aplicar filtros (espécie, idade, porte, localização)
+3. Visualizar perfil do animal (fotos, histórico de saúde, ONG responsável)
+4. Clicar **Estou Interessado** para notificar a ONG
 
-**Como Estender o Projeto (dicas de desenvolvimento)**
-- Adicionar microserviços se o sistema crescer: separar serviços de autenticação, gerenciamento de mídias, e buscas.
-- Substituir storage local por S3 (ou equivalente) para fotos e arquivos grandes.
-- Implementar notificações via fila (RabbitMQ/Kafka) para processos assíncronos (confirmação de adoção, envio de protocolo).
-- Adotar testes de integração separados da suíte unitária e usar containers (TestContainers) nos pipelines CI para testar com PostgreSQL real quando necessário.
+### 🏢 ONG / Abrigo
 
-**Sugestão de Jenkinsfile (exemplo simplificado)**
+1. Login na área administrativa
+2. Selecionar **Cadastrar Novo Animal**
+3. Preencher formulário (nome, espécie, idade, fotos, histórico)
+4. Confirmar cadastro — animal aparece na vitrine
 
-```
+### 🚨 Denúncias
+
+1. Acessar **Denunciar** (logado ou anônimo)
+2. Preencher descrição e anexar evidências (fotos, vídeos, localização)
+3. Enviar — sistema gera protocolo e encaminha para ONG/órgãos parceiros
+
+---
+
+## 🔧 Como Estender o Projeto (Sugestões de melhoria)
+
+- Migrar para arquitetura de microserviços se a carga aumentar
+- Usar S3 (ou similar) para armazenamento de mídia
+- Implementar filas (RabbitMQ/Kafka) para tarefas assíncronas
+- Isolar testes de integração e usar TestContainers para pipelines com PostgreSQL real
+
+---
+
+## 🧾 Exemplo de `Jenkinsfile` (simplificado)
+
+```groovy
 pipeline {
   agent any
   stages {
@@ -176,26 +227,19 @@ pipeline {
 }
 ```
 
-**Contato / Próximos Passos**
-- Para dúvidas ou contribuições, abrir uma issue neste repositório com o rótulo `enhancement` ou `bug`.
-- Próximo passo sugerido: criar `src/test/resources/application-test.properties` com configuração H2 e adicionar `@ActiveProfiles("test")` nos testes de integração para estabilizar CI.
+---
+
+## 📬 Contato e Próximos Passos
+
+- Abra issues com rótulos `enhancement` ou `bug` para contribuições
+- Próximo passo recomendado: criar `src/test/resources/application-test.properties` com configuração H2 e adicionar `@ActiveProfiles("test")` nas classes de integração
 
 ---
 
-Obrigado por colaborar com o Adopet.me — contribuições são bem-vindas! Sinta-se à vontade para pedir que eu também faça o commit e o push desse README para `origin/main`, ou que eu gere o `application-test.properties` e um `Jenkinsfile` real na raiz.
-# Sistema-Adopet_Me
-06P - Universidade Presbiteriana Mackenzie - Projeto Laboratório de Engenharia de Software  
+### 🏫 Sobre
 
----
+06P - Universidade Presbiteriana Mackenzie — Projeto: Laboratório de Engenharia de Software
 
-### Grupo:
-- Luis Felipe Basacchi Darre  
-- Danilo Yui Honda  
-- Matheus de Andrade Lourenço  
-- Murillo Cardoso Ferreira  
-- Pietro Zanaga Neto  
-
----
 
 ## Sobre o projeto
 O **Adopet.me** é um sistema de adoção de animais domésticos que conecta pessoas interessadas em adotar a ONGs de proteção animal. A plataforma funciona como uma vitrine digital, permitindo localizar ONGs próximas, visualizar os animais disponíveis e agendar visitas conforme a disponibilidade da organização.
